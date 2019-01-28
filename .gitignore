@@ -1,0 +1,11 @@
+bin/
+.vscode/
+.vs/
+*.obj
+*.ilk
+*.dll
+*.lib
+*.pdb
+.sconsign.dblite
+*.exe
+*.o
