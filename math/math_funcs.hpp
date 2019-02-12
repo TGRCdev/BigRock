@@ -7,7 +7,7 @@
 
 namespace bigrock
 {
-    struct MathFuncs
+    namespace math
     {
         static float degrees_to_radians(const float degrees)
         {
@@ -29,7 +29,7 @@ namespace bigrock
             float epsilon = std::numeric_limits<float>::epsilon();
             return fabs(v2 - v1) < epsilon;
         }
-    };
+    }
 }
 
 #endif
