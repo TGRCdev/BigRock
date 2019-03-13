@@ -16,11 +16,34 @@
             ]
         },
         {
+            "label": "Build Objects (MinGW)",
+            "type": "shell",
+            "command": "scons",
+            "group": "build",
+            "args": [
+                "use_mingw=yes"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
             "label": "Make Library",
             "type": "shell",
             "command": "scons",
             "args": [
                 "make_lib_folder=yes"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Make Library (MinGW)",
+            "type": "shell",
+            "command": "scons",
+            "args": [
+                "make_lib_folder=yes",
+                "use_mingw=yes"
             ],
             "group": "build",
             "problemMatcher": []
@@ -34,6 +57,18 @@
                 "-c"
             ],
             "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean Builds (MinGW)",
+            "type": "shell",
+            "command": "scons",
+            "args": [
+                "make_lib_folder=yes",
+                "use_mingw=yes",
+                "-c"
+            ],
+            "group":"build",
             "problemMatcher": []
         },
         {

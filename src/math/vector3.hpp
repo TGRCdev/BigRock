@@ -2,7 +2,7 @@
 #define BIGROCK_VECTOR3_H
 
 #include "math_funcs.hpp"
-#include "defines.hpp"
+#include "../defines.hpp"
 
 #include <stdexcept>
 
@@ -12,7 +12,7 @@ namespace bigrock
     {
         struct Vector3
         {
-            scalar_t x, y, z;
+            br_real x, y, z;
 
             // Constructors
 
@@ -23,7 +23,7 @@ namespace bigrock
                 this->z = 0;
             }
 
-            Vector3(scalar_t x, scalar_t y, scalar_t z)
+            Vector3(br_real x, br_real y, br_real z)
             {
                 this->x = x;
                 this->y = y;
@@ -40,17 +40,17 @@ namespace bigrock
             #pragma region Operators
 
             // T operators
-            Vector3 operator*(const scalar_t &val) const
+            Vector3 operator*(const br_real &val) const
             {
                 return Vector3(this->x * val, this->y * val, this->z * val);
             }
 
-            Vector3 operator/(const scalar_t &val) const
+            Vector3 operator/(const br_real &val) const
             {
                 return Vector3(this->x / val, this->y / val, this->z / val);
             }
 
-            Vector3 &operator*=(const scalar_t &val)
+            Vector3 &operator*=(const br_real &val)
             {
                 this->x *= val;
                 this->y *= val;
@@ -58,7 +58,7 @@ namespace bigrock
                 return *this;
             }
 
-            Vector3 &operator/=(const scalar_t &val)
+            Vector3 &operator/=(const br_real &val)
             {
                 this->x /= val;
                 this->y /= val;
@@ -136,7 +136,7 @@ namespace bigrock
                 return Vector3(-x, -y, -z);
             }
 
-            scalar_t &operator[](const int index)
+            br_real &operator[](const int index)
             {
                 switch (index)
                 {
@@ -151,7 +151,7 @@ namespace bigrock
                 }
             }
 
-            const scalar_t &operator[](const int index) const
+            const br_real &operator[](const int index) const
             {
                 switch (index)
                 {
@@ -170,26 +170,26 @@ namespace bigrock
 
             #pragma region Methods
 
-            scalar_t distance_squared_to(const Vector3 &other) const // Gets the distance to another Vector3 without a costly square root calculation
+            br_real distance_squared_to(const Vector3 &other) const // Gets the distance to another Vector3 without a costly square root calculation
             {
-                scalar_t xdelt, ydelt, zdelt;
+                br_real xdelt, ydelt, zdelt;
                 xdelt = (other.x - this->x);
                 ydelt = (other.y - this->y);
                 zdelt = (other.z - this->z);
                 return (xdelt * xdelt) + (ydelt * ydelt) + (zdelt * zdelt);
             }
 
-            scalar_t distance_to(const Vector3 &other) const // Gets the distance between two points. Use this if you NEED precise distance.
+            br_real distance_to(const Vector3 &other) const // Gets the distance between two points. Use this if you NEED precise distance.
             {
                 return sqrtf(this->distance_squared_to(other));
             }
 
-            scalar_t length_squared() const // Gets the squared length of the vector (avoids a square root calculation)
+            br_real length_squared() const // Gets the squared length of the vector (avoids a square root calculation)
             {
                 return (x * x) + (y * y) + (z * z);
             }
 
-            scalar_t length() const
+            br_real length() const
             {
                 return sqrtf(this->length_squared());
             }
@@ -237,7 +237,7 @@ namespace bigrock
                 return approx_equal(x, other.x) && approx_equal(y, other.y) && approx_equal(z, other.z);
             }
 
-            scalar_t dot(const Vector3 &other) const
+            br_real dot(const Vector3 &other) const
             {
                 return (x * other.x) + (y * other.y) + (z * other.x);
             }

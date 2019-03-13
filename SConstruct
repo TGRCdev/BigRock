@@ -1,4 +1,4 @@
-sourcepaths = ["terrain/", "math/"]
+sourcepaths = ["src/", "src/terrain/", "src/math/"]
 
 opts = Variables()
 opts.Add(EnumVariable('make_lib_folder', 'Set to \'yes\' to generate a folder with the headers and the lib included (under \'lib\').', 'no', ['yes', 'no'], ignorecase=2))
