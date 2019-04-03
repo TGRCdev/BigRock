@@ -3,6 +3,7 @@ lib/
 doc/
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+.vscode/
 .vs/
 *.obj
 *.ilk
@@ -12,3 +13,4 @@ doc/
 .sconsign.dblite
 *.exe
 *.o
+.DS_Store

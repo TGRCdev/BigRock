@@ -55,5 +55,24 @@ namespace bigrock
             global += origin;
             return global;
         }
+
+        // TODO: Check these Quat maths and make sure they work
+        Transform Transform::xform(const Transform &t) const
+        {
+            Transform result;
+            result.origin = to_local(t.origin);
+            result.scale = t.scale / scale;
+            result.rotation *= this->rotation;
+            return result;
+        }
+
+        Transform Transform::xform_inv(const Transform &t) const
+        {
+            Transform result;
+            result.origin = to_global(t.origin);
+            result.scale = t.scale * scale;
+            result.rotation *= this->rotation.conjugate();
+            return result;
+        }
     }
 }

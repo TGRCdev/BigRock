@@ -1,15 +1,22 @@
 #ifndef BIGROCK_VECTOR3_H
 #define BIGROCK_VECTOR3_H
 
-#include "math_funcs.hpp"
-#include "../defines.hpp"
+// TODO: Split into hpp and cpp
 
+#include "../defines.hpp"
+#include "math_funcs.hpp"
+
+#include <boost/container_hash/hash.hpp>
+
+#include <cmath>
 #include <stdexcept>
 
 namespace bigrock
 {
     namespace math
     {
+        struct Vector3;
+
         struct Vector3
         {
             br_real x, y, z;
@@ -229,7 +236,7 @@ namespace bigrock
 
             bool is_normalized() const // Checks if the length squared is equal to 1
             {
-                return fabsf(1.0 - this->length_squared()) < std::numeric_limits<float>::epsilon(); // Approximately equal to 1
+                return std::abs(1.0 - this->length_squared()) < std::numeric_limits<float>::epsilon(); // Approximately equal to 1
             }
 
             bool is_approximately_equal(const Vector3 &other) const // Checks if two Vector3s are within floating-point error range
@@ -252,8 +259,11 @@ namespace bigrock
                 return (*this) + ((other - *this) * t);
             }
 
+            static const Vector3 zero;
             #pragma endregion
         };
+
+        std::size_t hash_value(const bigrock::math::Vector3 &vec);
     }
 }
 

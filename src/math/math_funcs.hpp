@@ -2,32 +2,38 @@
 #define BIGROCK_MATH_FUNCS
 
 #define _USE_MATH_DEFINES
+
 #include <math.h>
 #include <limits>
+
+#include "../defines.hpp"
 
 namespace bigrock
 {
     namespace math
     {
-        static float degrees_to_radians(const float degrees)
+        static br_real degrees_to_radians(const br_real degrees)
         {
             return degrees * (M_PI / 180);
         }
 
-        static float radians_to_degrees(const float radians)
+        static br_real radians_to_degrees(const br_real radians)
         {
             return radians * (180 / M_PI);
         }
 
-        static float lerp(const float v1, const float v2, const float t)
+        static br_real lerp(const br_real v1, const br_real v2, const br_real t)
         {
             return v1 + ((v2 - v1) * t);
         }
 
-        static float approx_equal(const float v1, const float v2)
+        static br_real approx_equal(const br_real v1, const br_real v2)
         {
-            float epsilon = std::numeric_limits<float>::epsilon();
-            return fabs(v2 - v1) < epsilon;
+            if(v1 == v2)
+                return true;
+            
+            br_real epsilon = std::numeric_limits<br_real>::epsilon();
+            return abs(v2 - v1) < epsilon;
         }
     }
 }
