@@ -6,8 +6,6 @@
 #include "../defines.hpp"
 #include "math_funcs.hpp"
 
-#include <boost/container_hash/hash.hpp>
-
 #include <cmath>
 #include <stdexcept>
 
