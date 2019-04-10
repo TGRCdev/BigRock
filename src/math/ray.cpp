@@ -4,12 +4,6 @@ namespace bigrock
 {
     namespace math
     {
-        Ray::Ray()
-        {
-            origin = Vector3(0,0,0);
-            direction = Vector3(1,0,0);
-        }
-
         Ray::Ray(const Vector3 &origin, const Vector3 &direction)
         {
             this->origin = origin;

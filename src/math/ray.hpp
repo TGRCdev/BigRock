@@ -14,8 +14,7 @@ namespace bigrock
             public:
             Vector3 origin;
 
-            Ray();
-            Ray(const Vector3 &origin, const Vector3 &direction);
+            Ray(const Vector3 &origin = Vector3::zero, const Vector3 &direction = Vector3::zero);
 
             Vector3 get_direction() const {return direction;}
             void set_direction(const Vector3 &direction);

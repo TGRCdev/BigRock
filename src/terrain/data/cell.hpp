@@ -4,6 +4,7 @@
 #include "cell_vertex.hpp"
 #include "../grid_vertices.hpp"
 #include "../../math/aabb.hpp"
+#include "tool.hpp"
 
 namespace bigrock {
 namespace terrain {
@@ -46,6 +47,8 @@ class Cell
     CellVertex sample(const math::Vector3 &pos) const;
     // Same as sample, but uses pos as (0,0,0) to (1,1,1) within the cell
     CellVertex sample_local(const math::Vector3 &pos) const;
+
+    void apply_tool(const Tool &tool);
 
     int get_index_containing_pos(const math::Vector3 &pos) const;
     int get_index_containing_local_pos(const math::Vector3 &pos) const;

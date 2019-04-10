@@ -18,8 +18,7 @@ namespace bigrock
 
             // Constructors
 
-            Transform();
-            Transform(const Vector3 &origin, const Quaternion &rotation = Quaternion(), const Vector3 &scale = Vector3(1,1,1));
+            Transform(const Vector3 &origin = Vector3::zero, const Quaternion &rotation = Quaternion::identity, const Vector3 &scale = Vector3::one);
 
             // Methods
 
@@ -38,6 +37,8 @@ namespace bigrock
             Transform xform(const Transform &t) const;
             // Take the relative Transform and produce a global form
             Transform xform_inv(const Transform &t) const;
+
+            static const Transform identity;
         };
     }
 }

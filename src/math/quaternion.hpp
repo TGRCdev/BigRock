@@ -75,6 +75,8 @@ namespace bigrock
 			Vector3 xform(const Vector3 &point) const;
 
 			Vector3 xform_inv(const Vector3 &point) const;
+
+			static const Quaternion identity;
 		};
 	}
 }

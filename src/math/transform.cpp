@@ -4,13 +4,6 @@ namespace bigrock
 {
     namespace math
     {
-        Transform::Transform()
-        {
-            this->origin = Vector3();
-            this->rotation = Quaternion();
-            this->scale = Vector3(1,1,1);
-        }
-
         Transform::Transform(const Vector3 &origin, const Quaternion &rotation, const Vector3 &scale)
         {
             this->origin = origin;
@@ -74,5 +67,7 @@ namespace bigrock
             result.rotation *= this->rotation.conjugate();
             return result;
         }
+
+        const Transform Transform::identity = Transform();
     }
 }
