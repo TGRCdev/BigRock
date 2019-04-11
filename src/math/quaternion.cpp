@@ -4,13 +4,6 @@ namespace bigrock
 {
     namespace math
     {
-		Quaternion::Quaternion()
-		{
-			this->x = 0;
-			this->y = 0;
-			this->z = 0;
-			this->w = 1;
-		}
 		
 		Quaternion::Quaternion(const Quaternion &other)
 		{
@@ -20,7 +13,7 @@ namespace bigrock
 			this->w = other.w;
 		}
 
-		Quaternion::Quaternion(float x, float y, float z, float w)
+		Quaternion::Quaternion(br_real x, br_real y, br_real z, br_real w)
 		{
 			this->x = x;
 			this->y = y;
@@ -28,7 +21,7 @@ namespace bigrock
 			this->w = w;
 		}
 
-		Quaternion::Quaternion(const Vector3 &axis, const float radians)
+		Quaternion::Quaternion(const Vector3 &axis, const br_real radians)
 		{
 			Vector3 norm;
 			if(axis.is_normalized())
@@ -36,8 +29,8 @@ namespace bigrock
 			else
 				norm = axis.normalized();
 		
-			float sin_half = sinf(radians / 2);
-			float cos_half = cosf(radians / 2);
+			br_real sin_half = sinf(radians / 2);
+			br_real cos_half = cosf(radians / 2);
 
 			this->x = axis.x * sin_half;
 			this->y = axis.y * sin_half;
@@ -53,14 +46,6 @@ namespace bigrock
 			this->x = vector.x;
 			this->y = vector.y;
 			this->z = vector.z;
-			this->w = 1;
-		}
-
-		Quaternion::Quaternion(float x, float y, float z)
-		{
-			this->x = x;
-			this->y = y;
-			this->z = z;
 			this->w = 1;
 		}
 
@@ -97,7 +82,7 @@ namespace bigrock
 			return ret;
 		}
 
-		Quaternion &Quaternion::operator*=(const float value)
+		Quaternion &Quaternion::operator*=(const br_real value)
 		{
 			this->x *= value;
 			this->y *= value;
@@ -106,7 +91,7 @@ namespace bigrock
 			return *this;
 		}
 
-		Quaternion Quaternion::operator*(const float value) const
+		Quaternion Quaternion::operator*(const br_real value) const
 		{
 			Quaternion ret = *this;
 			ret *= value;
@@ -124,12 +109,12 @@ namespace bigrock
 		}
 
 		// Methods
-		float Quaternion::length_squared() const
+		br_real Quaternion::length_squared() const
 		{
 			return (x*x) + (y*y) + (z*z) + (w*w);
 		}
 
-		float Quaternion::length() const
+		br_real Quaternion::length() const
 		{
 			return sqrtf(length_squared());
 		}
@@ -144,7 +129,7 @@ namespace bigrock
 			if(length_squared() == 0 || is_normalized())
 				return;
 			
-			float len = length();
+			br_real len = length();
 			this->x /= len;
 			this->y /= len;
 			this->z /= len;
@@ -190,13 +175,13 @@ namespace bigrock
 			).normalized();
 		}
 
-		void Quaternion::rotate_axis(const Vector3 &axis, const float radians)
+		void Quaternion::rotate_axis(const Vector3 &axis, const br_real radians)
 		{
 			Quaternion mul = Quaternion(axis, radians);
 			*this = mul * (*this); // This feels hacky but lets go with it
 		}
 
-		void Quaternion::rotate_axis_degrees(const Vector3 &axis, const float degrees)
+		void Quaternion::rotate_axis_degrees(const Vector3 &axis, const br_real degrees)
 		{
 			rotate_axis(axis, degrees_to_radians(degrees));
 		}
@@ -205,12 +190,12 @@ namespace bigrock
 		// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 		void Quaternion::rotate_euler(const Vector3 &radians)
 		{
-			float cx = cosf(radians.x * 0.5);
-			float sx = sinf(radians.x * 0.5);
-			float cy = cosf(radians.y * 0.5);
-			float sy = sinf(radians.y * 0.5);
-			float cz = cosf(radians.z * 0.5);
-			float sz = sinf(radians.z * 0.5);
+			br_real cx = cosf(radians.x * 0.5);
+			br_real sx = sinf(radians.x * 0.5);
+			br_real cy = cosf(radians.y * 0.5);
+			br_real sy = sinf(radians.y * 0.5);
+			br_real cz = cosf(radians.z * 0.5);
+			br_real sz = sinf(radians.z * 0.5);
 
 			Quaternion q;
 			q.w = cx * cy * cz + sx * sy * sz;

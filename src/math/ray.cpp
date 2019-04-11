@@ -18,7 +18,7 @@ namespace bigrock
                 this->direction = direction.normalized();
         }
 
-        Vector3 Ray::get_point_on_ray(const float t) const
+        Vector3 Ray::get_point_on_ray(const br_real t) const
         {
             return origin + (direction * t);
         }

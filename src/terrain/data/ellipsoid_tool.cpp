@@ -4,7 +4,7 @@ namespace bigrock {
 namespace terrain {
 namespace data {
 
-EllipsoidTool::EllipsoidTool(const math::Transform &t = math::Transform::identity)
+EllipsoidTool::EllipsoidTool(const math::Transform &t)
 {
     this->transform = t;
 }

@@ -18,7 +18,7 @@ namespace bigrock
 
             Vector3 get_direction() const {return direction;}
             void set_direction(const Vector3 &direction);
-            Vector3 get_point_on_ray(const float t) const;
+            Vector3 get_point_on_ray(const br_real t) const;
             Vector3 get_closest_point(const Vector3 &target) const;
         };
     }

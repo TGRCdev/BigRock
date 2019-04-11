@@ -9,7 +9,7 @@ namespace data {
 
 struct EllipsoidTool : public Tool
 {
-    EllipsoidTool(const math::Transform &t);
+    EllipsoidTool(const math::Transform &t = math::Transform::identity);
 
     br_real value(const math::Vector3 &point) const;
     math::AABB get_aabb() const;

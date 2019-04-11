@@ -5,6 +5,7 @@
 #include "../grid_vertices.hpp"
 #include "../../math/aabb.hpp"
 #include "tool.hpp"
+#include "action.hpp"
 
 namespace bigrock {
 namespace terrain {
@@ -32,6 +33,8 @@ class Cell
     const Cell *get_child(const int &index) const {return is_leaf() ? NULL : children + index;}
     unsigned int get_subdiv_level() const {return subdiv_level;}
 
+    math::Vector3 calc_gradient(const math::Vector3 &point, const br_real &size = 1.0) const;
+
     // Returns true if this cell has no children
     bool is_leaf() const {return children == NULL;}
     // Returns true if this cell can be collapsed without losing unique data
@@ -48,7 +51,7 @@ class Cell
     // Same as sample, but uses pos as (0,0,0) to (1,1,1) within the cell
     CellVertex sample_local(const math::Vector3 &pos) const;
 
-    void apply_tool(const Tool &tool);
+    void apply_tool(const Tool &tool, const Action &action);
 
     int get_index_containing_pos(const math::Vector3 &pos) const;
     int get_index_containing_local_pos(const math::Vector3 &pos) const;

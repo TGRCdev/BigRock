@@ -6,6 +6,8 @@
 #include "vector3.hpp"
 #include "math_funcs.hpp"
 
+#include "../defines.hpp"
+
 namespace bigrock
 {
 	namespace math
@@ -13,20 +15,16 @@ namespace bigrock
 		class Quaternion
 		{
 			public:
-			float x, y, z, w;
+			br_real x, y, z, w;
 
 			// Constructors
-			Quaternion();
-			
 			Quaternion(const Quaternion &other);
 
-			Quaternion(float x, float y, float z, float w);
+			Quaternion(br_real x = 0, br_real y = 0, br_real z = 0, br_real w = 1);
 
-			Quaternion(const Vector3 &axis, const float radians);
+			Quaternion(const Vector3 &axis, const br_real radians);
 
 			Quaternion(const Vector3 &vector);
-
-			Quaternion(float x, float y, float z);
 
 			// Operators
 			Quaternion &operator*=(const Quaternion &other);
@@ -37,18 +35,18 @@ namespace bigrock
 
 			Quaternion operator*(const Vector3 &vec) const;
 
-			Quaternion &operator*=(const float value);
+			Quaternion &operator*=(const br_real value);
 
-			Quaternion operator*(const float value) const;
+			Quaternion operator*(const br_real value) const;
 
 			bool operator==(const Quaternion &other) const;
 
 			bool operator!=(const Quaternion &other) const;
 
 			// Methods
-			float length_squared() const;
+			br_real length_squared() const;
 
-			float length() const;
+			br_real length() const;
 
 			bool is_normalized() const;
 
@@ -64,9 +62,9 @@ namespace bigrock
 
 			Vector3 get_forward() const;
 
-			void rotate_axis(const Vector3 &axis, const float radians);
+			void rotate_axis(const Vector3 &axis, const br_real radians);
 
-			void rotate_axis_degrees(const Vector3 &axis, const float degrees);
+			void rotate_axis_degrees(const Vector3 &axis, const br_real degrees);
 
 			// Rotates the Quaternion on the X, Y, and Z axes respectively
 			// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles

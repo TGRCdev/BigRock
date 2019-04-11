@@ -15,6 +15,8 @@ struct Vertex
     math::Vector3 normal; // Normal
     float tx, ty; // Tex coords
 
+    Vertex interpolate(const Vertex &other, const br_real &t) const;
+
     bool operator==(const Vertex &other) const;
     bool operator!=(const Vertex &other) const;
 };

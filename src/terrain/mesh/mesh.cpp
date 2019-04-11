@@ -40,7 +40,7 @@ void Mesh::add_surface(const unsigned int &surface, const Vertex *input, const u
 void Mesh::clear_surface(const unsigned int &surface)
 {
     surfaces.erase(surface);
-    if(surface_indices.erase(surface) > 0);
+    if(surface_indices.erase(surface) > 0)
     {
         si_buffer.resize(surface_indices.size());
         std::copy(surface_indices.begin(), surface_indices.end(), si_buffer.begin());

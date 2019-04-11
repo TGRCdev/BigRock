@@ -37,6 +37,15 @@ Cell::~Cell()
     }
 }
 
+math::Vector3 Cell::calc_gradient(const math::Vector3 &point, const br_real &half_size) const
+{
+    math::Vector3 ret;
+    ret.x = (sample(point + math::Vector3(half_size, 0, 0)).isovalue + sample(point - math::Vector3(half_size, 0, 0)).isovalue) / 2;
+    ret.y = (sample(point + math::Vector3(0, half_size, 0)).isovalue + sample(point - math::Vector3(0, half_size, 0)).isovalue) / 2;
+    ret.z = (sample(point + math::Vector3(0, 0, half_size)).isovalue + sample(point - math::Vector3(0, 0, half_size)).isovalue) / 2;
+    return ret.normalized();
+}
+
 bool Cell::can_collapse() const
 {
     if (!is_leaf())
@@ -191,6 +200,26 @@ math::AABB Cell::get_aabb() const
     ret.position = vertices[0]->position;
     ret.size = vertices[7]->position - vertices[0]->position;
     return ret;
+}
+
+void Cell::apply_tool(const Tool &t, const Action &a)
+{
+    for(int i = 0; i < 8; i++)
+        a.update(t, *vertices[i]);
+    
+    if(this->subdiv_level < a.max_subdiv_level)
+    {
+        math::AABB tool_aabb = t.get_aabb();
+
+        if(is_leaf())
+            subdivide();
+
+        for(int i = 0; i < 8; i++)
+        {
+            if(children[i].get_aabb().intersects(tool_aabb))
+                children[i].apply_tool(t, a);
+        }
+    }
 }
 
 }}}
