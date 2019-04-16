@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <map>
 
 namespace bigrock {
@@ -17,16 +18,18 @@ namespace mesh {
  */
 class Mesh
 {
-    struct CmpClass
+    struct verthash
     {
-        bool operator() (const std::pair<Vertex, unsigned int> &p1, const std::pair<Vertex, unsigned int> &p2) const
+        std::size_t operator()(const std::pair<Vertex, unsigned int> &key) const
         {
-            return p1.first.position.is_approximately_equal(p2.first.position);
+            return ((std::hash<float>()(key.first.position.x)
+               ^ (std::hash<float>()(key.first.position.y) << 1)) >> 1)
+               ^ (std::hash<float>()(key.first.position.z) << 1);
         }
     };
 
     std::vector<Vertex> vbuffer;
-    std::set<std::pair<Vertex, unsigned int>, CmpClass> vertices;
+    std::unordered_set<std::pair<Vertex, unsigned int>, verthash> vertices;
     std::map<unsigned int, std::vector<unsigned int> > surfaces;
     
     std::set<unsigned int> surface_indices;

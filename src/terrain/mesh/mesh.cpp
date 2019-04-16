@@ -11,8 +11,10 @@ void Mesh::add_surface(const unsigned int &surface, const Vertex *input, const u
 
     unsigned int current_index = vbuffer.size();
     int before_size = surfaces.size();
+    surfaces[surface] = std::vector<unsigned int>();
     std::vector<unsigned int> *indices = &surfaces[surface];
-    if(before_size != surfaces.size())
+    surface_indices.insert(surface);
+    if(before_size != surface_indices.size())
     {
         si_buffer.resize(surface_indices.size());
         std::copy(surface_indices.begin(), surface_indices.end(), si_buffer.begin());
@@ -21,7 +23,7 @@ void Mesh::add_surface(const unsigned int &surface, const Vertex *input, const u
     for(unsigned int i = 0; i < vert_count; i++)
     {
         std::pair<Vertex, unsigned int> current_pair(input[i], current_index);
-        std::set<std::pair<Vertex, unsigned int> >::iterator it = vertices.find(current_pair);
+        std::unordered_set<std::pair<Vertex, unsigned int> >::iterator it = vertices.find(current_pair);
         if(it != vertices.end())
             indices->push_back(it->second);
         else
@@ -33,7 +35,7 @@ void Mesh::add_surface(const unsigned int &surface, const Vertex *input, const u
     }
 
     vbuffer.resize(vertices.size());
-    for(std::set<std::pair<Vertex, unsigned int>>::iterator it = vertices.begin(); it != vertices.end(); it++)
+    for(std::unordered_set<std::pair<Vertex, unsigned int>>::iterator it = vertices.begin(); it != vertices.end(); it++)
         vbuffer[it->second] = it->first;
 }
 

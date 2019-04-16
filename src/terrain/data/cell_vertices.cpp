@@ -6,6 +6,13 @@ namespace bigrock {
 namespace terrain {
 namespace data {
 
+CellVertex::CellVertex(const math::Vector3 &position, const br_real &value, const unsigned int &material)
+{
+    this->position = position;
+    this->isovalue = value;
+    this->material = material;
+}
+
 CellVertex CellVertex::interpolate(const CellVertex &other, const float &t) const
 {
     if (t <= 0.0)
@@ -42,7 +49,7 @@ bool CellVertex::can_collapse(const CellVertex &other) const
 {
     if(math::sign_changes(this->isovalue, other.isovalue)) // Crosses isosurface
         return false;
-    else if(this->isovalue <= 0 || other.isovalue <= 0) // Empty space
+    else if(this->isovalue <= 0 && other.isovalue <= 0) // Empty space
         return true;
     else if(this->material != other.material) // Filled space, but seperate materials
         return false;

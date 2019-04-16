@@ -67,25 +67,25 @@ void Cell::subdivide()
         return;
     
     // Step 1: Setup vertices
-    CellVertex *vertex_pointers[2][2][2];
+    CellVertex *vertex_pointers[3][3][3];
     std::set<CellVertex*> owned;
     // Prepare existing vertices for sharing
     for(int i = 0; i < 8; i++)
     {
         owned.insert(vertices[i]);
-        math::Vector3 p = GRID_VERTICES[i];
+        math::Vector3 p = GRID_VERTICES[i] * 2;
         vertex_pointers[int(p.x)][int(p.y)][int(p.z)] = vertices[i];
     }
 
-    for(int x = 0; x < 2; x++)
-        for(int y = 0; y < 2; y++)
-            for(int z = 0; z < 2; z++)
+    for(int x = 0; x < 3; x++)
+        for(int y = 0; y < 3; y++)
+            for(int z = 0; z < 3; z++)
             {
                 if(!(
                     (x == 0 || x == 2) && 
                     (y == 0 || y == 2) && 
                     (z == 0 || z == 2)))
-                    vertex_pointers[x][y][z] = new CellVertex(sample_local(math::Vector3(x, y, z) / 2));
+                    vertex_pointers[x][y][z] = new CellVertex(sample_local(math::Vector3(x, y, z) / 2.0));
             }
     
     // Step 2: Add children
@@ -96,12 +96,12 @@ void Cell::subdivide()
         math::Vector3 cpos = GRID_VERTICES[i];
         for(int j = 0; j < 8; j++)
         {
-            math::Vector3 vpos = (GRID_VERTICES[j] + cpos) / 2;
+            math::Vector3 vpos = (GRID_VERTICES[j] + cpos);
             children[i].vertices[j] = vertex_pointers[int(vpos.x)][int(vpos.y)][int(vpos.z)];
-            if(owned.find(children[i].vertices[j]) == owned.end())
+            if(owned.find(vertex_pointers[int(vpos.x)][int(vpos.y)][int(vpos.z)]) == owned.end())
             {
                 owned.insert(children[i].vertices[j]);
-                children[i].owned_vertices |= (1 << i);
+                children[i].owned_vertices |= (1 << j);
             }
         }
     }
@@ -118,6 +118,7 @@ void Cell::undivide()
     }
 
     free(children);
+    children = NULL;
 }
 
 void Cell::try_undivide()

@@ -14,15 +14,19 @@ EmplaceAction::EmplaceAction(const unsigned int &material, const unsigned int &m
 void EmplaceAction::update(const Tool &t, CellVertex &v) const
 {
     br_real val = t.value(v.position);
-    if(remove)
+    if(!remove)
     {
-        if(v.isovalue > 0) // Vertex inside tool
-            v.isovalue = val;
-        else if(val > -1) // Vertex within influence
-            v.isovalue = (v.isovalue < -val ? v.isovalue : -val);
+        if(val > 0 || (val > -1 && v.isovalue < val)) // Vertex inside tool
+        {
+            if(val > v.isovalue)
+                v.isovalue = val;
+            if(val > 0)
+                v.material = material;
+        }
     }
     else
-        v.isovalue = val;
+        if(-val < v.isovalue)
+            v.isovalue = -val;
 }
 
 }

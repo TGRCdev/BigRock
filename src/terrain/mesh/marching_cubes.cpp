@@ -3,6 +3,8 @@
 #include "../../math/math_funcs.hpp"
 
 #include <map>
+#include <unordered_map>
+#include <assert.h>
 
 namespace bigrock {
 namespace terrain {
@@ -353,6 +355,9 @@ EdgeVertex vert_interp(const data::CellVertex &v1, const data::CellVertex &v2)
 
 Vertex edge_vert_interp(const EdgeVertex &e1, const EdgeVertex &e2)
 {
+    assert(e1.vertex != math::Vector3::zero);
+    assert(e2.vertex != math::Vector3::zero);
+
     Vertex ret;
     br_real t = (-e1.value) / (-e2.value - e1.value);
     ret.position = e1.vertex.position.lerp(e2.vertex.position, t);
@@ -360,11 +365,11 @@ Vertex edge_vert_interp(const EdgeVertex &e1, const EdgeVertex &e2)
     return ret;
 }
 
-struct PairComp
+struct hasher
 {
-    bool operator() (const std::pair<unsigned int, unsigned int> &p1, const std::pair<unsigned int, unsigned int> &p2) const
+    std::size_t operator() (const std::pair<unsigned int, unsigned int> &key) const
     {
-        return ((p1.first == p2.first) && (p1.second == p2.second)) || ((p1.first == p2.second) && (p1.second == p2.first));
+        return std::hash<unsigned int>()(__min(key.first, key.second)) ^ std::hash<unsigned int>()(__max(key.first, key.second));
     }
 };
 
@@ -402,7 +407,6 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
         if(edgeTable[cubeindex] & (1 << ##index))\
         {\
             edge_verts[##index] = vert_interp(*cell.get_vertex(##vert1), *cell.get_vertex(##vert2));\
-            edge_verts[##index].vertex.normal = cell.calc_gradient(edge_verts[##index].vertex.position, (1.0 / (2 << cell.get_subdiv_level())));\
         }
 
         EDGE_CHECK(0, 4, 5)
@@ -420,7 +424,9 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
 
         #undef EDGE_CHECK
 
-        std::map<std::pair<unsigned int, unsigned int>, Vertex, PairComp> edge_midpoints;
+        std::unordered_map<std::pair<unsigned int, unsigned int>, Vertex, hasher> edge_midpoints;
+
+        #define MINMAX_PAIR(v1, v2) std::pair<unsigned int, unsigned int>(__min(v1, v2), __max(v1, v2))
 
         for(int i = 0; i < 12; i++)
         {
@@ -429,24 +435,27 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
             
             for(int j = 0; j < 12; j++)
             {
-                if(i == j || (edgeTable[cubeindex] & (1 << j)) == 0 || edge_verts[i].material == edge_verts[j].material || edge_midpoints.find(std::pair<unsigned int, unsigned int>(i, j)) != edge_midpoints.end())
+                std::pair<unsigned int, unsigned int> p(__min(i, j), __max(i, j));
+                if(i == j || (edgeTable[cubeindex] & (1 << j)) == 0 || edge_verts[i].material == edge_verts[j].material || edge_midpoints.find(p) != edge_midpoints.end())
                     continue;
                 
                 Vertex midpoint = edge_vert_interp(edge_verts[i], edge_verts[j]);
-                edge_midpoints.insert(std::make_pair(std::pair<unsigned int, unsigned int>(i, j), midpoint));
+                assert(midpoint.position != math::Vector3::zero);
+                edge_midpoints.insert(std::make_pair(p, midpoint));
             }
         }
 
         #define ADD_TRI(surf_offset, vert1, vert2, vert3)\
-        surfaces[triTable[cubeindex][i+##surf_offset]].push_back(vert1);\
-        surfaces[triTable[cubeindex][i+##surf_offset]].push_back(vert2);\
-        surfaces[triTable[cubeindex][i+##surf_offset]].push_back(vert3);
+        assert(vert1 != math::Vector3::zero);\
+        surfaces[edge_verts[triTable[cubeindex][i+##surf_offset]].material].push_back(vert1);\
+        assert(vert2 != math::Vector3::zero);\
+        surfaces[edge_verts[triTable[cubeindex][i+##surf_offset]].material].push_back(vert2);\
+        assert(vert3 != math::Vector3::zero);\
+        surfaces[edge_verts[triTable[cubeindex][i+##surf_offset]].material].push_back(vert3);
 
-        #define EDGEPOINT(offset)\
-        edge_verts[triTable[cubeindex][i+##offset]].vertex
+        #define EDGEPOINT(offset) edge_verts[triTable[cubeindex][i+##offset]].vertex
 
-        #define MIDPOINT(off1, off2)\
-        edge_midpoints[std::pair<unsigned int, unsigned int>(triTable[cubeindex][i+##off1], triTable[cubeindex][i+##off2])]
+        #define MIDPOINT(off1, off2) edge_midpoints[MINMAX_PAIR(triTable[cubeindex][i+##off1], triTable[cubeindex][i+##off2])]
 
         for(int i = 0; triTable[cubeindex][i] != -1; i += 3)
         {
@@ -457,7 +466,7 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
                 tri_config |= 2;
             switch(tri_config)
             {
-                case 0: // 0 -> 1 -> 2 (1 tri)
+                case 0: // 0 -> 1 -> 2 -> 0 (1 tri)
                 {
                     ADD_TRI(0,
                         EDGEPOINT(0),
@@ -465,7 +474,8 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
                         EDGEPOINT(2)
                     )
                 }
-                case 1: // 0 -x> 1 -> 2 (3 tris)
+                break;
+                case 1: // 0 -x> 1 -> 2 -x> 0 (3 tris)
                 {
                     ADD_TRI(0,
                         EDGEPOINT(0),
@@ -473,45 +483,47 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
                         MIDPOINT(0, 2)
                     )
                     ADD_TRI(1,
-                        MIDPOINT(0, 2),
-                        MIDPOINT(0, 1),
-                        EDGEPOINT(1)
+                        MIDPOINT(0,2),
+                        MIDPOINT(0,1),
+                        EDGEPOINT(2)
                     )
                     ADD_TRI(2,
                         EDGEPOINT(2),
-                        MIDPOINT(0, 1),
+                        MIDPOINT(0,1),
                         EDGEPOINT(1)
                     )
                 }
-                case 2: // 0 -> 1 -x> 2 (3 tris)
+                break;
+                case 2: // 0 -> 1 -x> 2 -x> 0 (3 tris)
                 {
                     ADD_TRI(0,
                         EDGEPOINT(0),
-                        MIDPOINT(1, 2),
-                        MIDPOINT(0, 2)
+                        EDGEPOINT(1),
+                        MIDPOINT(0,2)
                     )
                     ADD_TRI(1,
-                        EDGEPOINT(0),
+                        MIDPOINT(0,2),
                         EDGEPOINT(1),
                         MIDPOINT(1,2)
                     )
                     ADD_TRI(2,
-                        MIDPOINT(0, 1),
-                        MIDPOINT(1, 2),
+                        MIDPOINT(0,2),
+                        MIDPOINT(1,2),
                         EDGEPOINT(2)
                     )
                 }
+                break;
                 case 3: // 0 -x> 1 -x> 2 (SPECIAL CASE)
                 {
                     if(edge_verts[triTable[cubeindex][i]].material == edge_verts[triTable[cubeindex][i+2]].material)
                     { // 0 -x> 1 -x> 2 -> 0 (3 tris)
                         ADD_TRI(0,
                             EDGEPOINT(0),
-                            MIDPOINT(0, 1),
+                            MIDPOINT(0,1),
                             EDGEPOINT(2)
                         )
                         ADD_TRI(1,
-                            MIDPOINT(0, 1),
+                            MIDPOINT(0,1),
                             EDGEPOINT(1),
                             MIDPOINT(1,2)
                         )
@@ -556,6 +568,7 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
                         )
                     }
                 }
+                break;
                 default: // Shouldn't happen but who knows
                     break;
             }

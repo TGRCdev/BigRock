@@ -57,6 +57,9 @@ class Cell
     int get_index_containing_local_pos(const math::Vector3 &pos) const;
 
     math::AABB get_aabb() const;
+
+    // TEST FUNCS
+    int get_owned_vertices() const {return this->owned_vertices;}
 };
 
 }}}
