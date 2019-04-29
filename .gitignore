@@ -3,7 +3,7 @@ lib/
 doc/
 .vscode/c_cpp_properties.json
 .vscode/settings.json
-.vscode/
+.vscode/launch.json
 .vs/
 *.obj
 *.ilk
@@ -11,6 +11,18 @@ doc/
 *.lib
 *.pdb
 .sconsign.dblite
+.sconf_temp
+config.log
 *.exe
 *.o
+*.os
 .DS_Store
+*.glsl.h
+*.jpg.h
+*.bmp.h
+*.jpeg.h
+*.png.h
+img_conv
+test/src/resources/images/*.h
+test/src/resources/images/*.cpp
+.vscode/ipch/

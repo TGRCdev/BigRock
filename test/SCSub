@@ -1,0 +1,4 @@
+Import('env', 'sources', 'conf')
+testops = Variables()
+
+env.Program(target='bin/test', source = sources + ['cell_test.cpp'])

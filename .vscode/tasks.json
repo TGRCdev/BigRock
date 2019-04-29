@@ -1,82 +1,126 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Build Objects",
-            "type": "shell",
-            "command": "scons",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
-        {
-            "label": "Build Objects (MinGW)",
-            "type": "shell",
-            "command": "scons",
-            "group": "build",
-            "args": [
-                "use_mingw=yes"
-            ],
-            "problemMatcher": [
-                "$gcc"
-            ]
-        },
-        {
-            "label": "Make Library",
-            "type": "shell",
-            "command": "scons",
-            "args": [
-                "make_lib_folder=yes"
-            ],
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Make Library (MinGW)",
-            "type": "shell",
-            "command": "scons",
-            "args": [
-                "make_lib_folder=yes",
-                "use_mingw=yes"
-            ],
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Clean Builds",
-            "type": "shell",
-            "command": "scons",
-            "args": [
-                "make_lib_folder=yes",
-                "-c"
-            ],
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Clean Builds (MinGW)",
-            "type": "shell",
-            "command": "scons",
-            "args": [
-                "make_lib_folder=yes",
-                "use_mingw=yes",
-                "-c"
-            ],
-            "group":"build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Generate Docs",
-            "type": "shell",
-            "command": "doxygen",
-            "group": "build",
-            "problemMatcher": []
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Objects",
+      "type": "shell",
+      "command": "scons",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "Build Objects (MinGW)",
+      "type": "shell",
+      "command": "scons",
+      "group": "build",
+      "args": [
+        "use_mingw=yes"
+      ],
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "Make Static Library",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=static",
+        "make_dir=yes"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Make Static Library (MinGW)",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=static",
+        "make_dir=yes",
+        "use_mingw=yes"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Test Program",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=test"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean Test Program",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=test",
+        "-c"
+      ],
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Test",
+      "dependsOn": [
+        "Build Test Program"
+      ],
+      "type": "process",
+      "windows": {
+        "command": "test\\bin\\BigRockTest.exe"
+      },
+      "linux": {
+        "command": "test/bin/BigRockTest"
+      },
+      "osx": {
+        "command": "test/bin/BigRockTest"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean Builds",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=static",
+        "make_dir=yes",
+        "-c"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean Builds (MinGW)",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=static",
+        "make_dir=yes",
+        "use_mingw=yes",
+        "-c"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Generate Docs",
+      "type": "shell",
+      "command": "doxygen",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
 }
