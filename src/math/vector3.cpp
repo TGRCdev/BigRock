@@ -20,40 +20,23 @@ namespace bigrock
 
         #pragma region Operators
 
-        #define OPERATOR_REAL(op) Vector3 Vector3::operator##op(const br_real &val) const\
-        {return Vector3(this->x op val, this->y op val, this->z op val);}
-
-        #define OPERATOR_REALREF(op) Vector3 &Vector3::operator##op=(const br_real &val)\
-        {this->x op= val; this->y op= val; this->z op= val; return *this;}
-
-        #define OPERATOR_VEC3(op) Vector3 Vector3::operator##op(const Vector3 &other) const\
-        {return Vector3(this->x op other.x, this->y op other.y, this->z op other.z);}
-
-        #define OPERATOR_VEC3REF(op) Vector3 &Vector3::operator##op=(const Vector3 &other)\
-        {this->x op= other.x;this->y op= other.y;this->z op= other.z;return *this;}
-
         // VSCode HATES these macros but im lazy
 
-        OPERATOR_REAL(*)
-        OPERATOR_REAL(/)
+        Vector3 Vector3::operator*(const br_real &val) const {return Vector3(this->x * val, this->y * val, this->z * val);}
+        Vector3 Vector3::operator/(const br_real &val) const {return Vector3(this->x / val, this->y / val, this->z / val);}
 
-        OPERATOR_REALREF(*)
-        OPERATOR_REALREF(/)
+        Vector3 &Vector3::operator*=(const br_real &val) {this->x *= val; this->y *= val; this->z *= val; return *this;}
+        Vector3 &Vector3::operator/=(const br_real &val) {this->x /= val; this->y /= val; this->z /= val; return *this;}
 
-        OPERATOR_VEC3(+)
-        OPERATOR_VEC3(-)
-        OPERATOR_VEC3(*)
-        OPERATOR_VEC3(/)
+        Vector3 Vector3::operator+(const Vector3 &other) const {return Vector3(this->x + other.x, this->y + other.y, this->z + other.z);}
+        Vector3 Vector3::operator-(const Vector3 &other) const {return Vector3(this->x - other.x, this->y - other.y, this->z - other.z);}
+        Vector3 Vector3::operator*(const Vector3 &other) const {return Vector3(this->x * other.x, this->y * other.y, this->z * other.z);}
+        Vector3 Vector3::operator/(const Vector3 &other) const {return Vector3(this->x / other.x, this->y / other.y, this->z / other.z);}
 
-        OPERATOR_VEC3REF(+)
-        OPERATOR_VEC3REF(-)
-        OPERATOR_VEC3REF(*)
-        OPERATOR_VEC3REF(/)
-
-        #undef OPERATOR_REAL
-        #undef OPERATOR_REALREF
-        #undef OPERATOR_VEC3
-        #undef OPERATOR_VEC3REF
+        Vector3 &Vector3::operator+=(const Vector3 &other) {this->x += other.x; this->y += other.y; this->z += other.z; return *this;}
+        Vector3 &Vector3::operator-=(const Vector3 &other) {this->x -= other.x; this->y -= other.y; this->z -= other.z; return *this;}
+        Vector3 &Vector3::operator*=(const Vector3 &other) {this->x *= other.x; this->y *= other.y; this->z *= other.z; return *this;}
+        Vector3 &Vector3::operator/=(const Vector3 &other) {this->x /= other.x; this->y /= other.y; this->z /= other.z; return *this;}
 
         bool Vector3::operator==(const Vector3 &other) const
         {
