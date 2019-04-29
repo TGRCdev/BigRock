@@ -16,7 +16,8 @@ ToolCopy::ToolCopy(const ToolCopy &other) : tool_copy(other.tool_copy)
 
 ToolCopy::~ToolCopy()
 {
-    delete tool_copy;
+    delete tool_copy; // Generates a warning on OSX because a non-virtual abstract destructor is called
+    // TODO: Fix
 }
 
 br_real ToolCopy::value(const math::Vector3 &point) const

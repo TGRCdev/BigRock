@@ -23,7 +23,7 @@ void Mesh::add_surface(const unsigned int &surface, const Vertex *input, const u
     for(unsigned int i = 0; i < vert_count; i++)
     {
         std::pair<Vertex, unsigned int> current_pair(input[i], current_index);
-        std::unordered_set<std::pair<Vertex, unsigned int> >::iterator it = vertices.find(current_pair);
+        std::unordered_set<std::pair<Vertex, unsigned int>, verthash>::iterator it = vertices.find(current_pair);
         if(it != vertices.end())
             indices->push_back(it->second);
         else
@@ -35,7 +35,7 @@ void Mesh::add_surface(const unsigned int &surface, const Vertex *input, const u
     }
 
     vbuffer.resize(vertices.size());
-    for(std::unordered_set<std::pair<Vertex, unsigned int>>::iterator it = vertices.begin(); it != vertices.end(); it++)
+    for(std::unordered_set<std::pair<Vertex, unsigned int>, verthash>::iterator it = vertices.begin(); it != vertices.end(); it++)
         vbuffer[it->second] = it->first;
 }
 

@@ -4,7 +4,7 @@
 
 #include <map>
 #include <unordered_map>
-#include <assert.h>
+#include <algorithm>
 
 namespace bigrock {
 namespace terrain {
@@ -355,9 +355,6 @@ EdgeVertex vert_interp(const data::CellVertex &v1, const data::CellVertex &v2)
 
 Vertex edge_vert_interp(const EdgeVertex &e1, const EdgeVertex &e2)
 {
-    assert(e1.vertex != math::Vector3::zero);
-    assert(e2.vertex != math::Vector3::zero);
-
     Vertex ret;
     br_real t = (-e1.value) / (-e2.value - e1.value);
     ret.position = e1.vertex.position.lerp(e2.vertex.position, t);
@@ -369,7 +366,7 @@ struct hasher
 {
     std::size_t operator() (const std::pair<unsigned int, unsigned int> &key) const
     {
-        return std::hash<unsigned int>()(__min(key.first, key.second)) ^ std::hash<unsigned int>()(__max(key.first, key.second));
+        return std::hash<unsigned int>()(std::min(key.first, key.second)) ^ std::hash<unsigned int>()(std::max(key.first, key.second));
     }
 };
 
@@ -404,9 +401,9 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
         EdgeVertex edge_verts[12];
 
         #define EDGE_CHECK(index, vert1, vert2)\
-        if(edgeTable[cubeindex] & (1 << ##index))\
+        if(edgeTable[cubeindex] & (1 << index ))\
         {\
-            edge_verts[##index] = vert_interp(*cell.get_vertex(##vert1), *cell.get_vertex(##vert2));\
+            edge_verts[ index ] = vert_interp(*cell.get_vertex( vert1 ), *cell.get_vertex( vert2 ));\
         }
 
         EDGE_CHECK(0, 4, 5)
@@ -426,7 +423,7 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
 
         std::unordered_map<std::pair<unsigned int, unsigned int>, Vertex, hasher> edge_midpoints;
 
-        #define MINMAX_PAIR(v1, v2) std::pair<unsigned int, unsigned int>(__min(v1, v2), __max(v1, v2))
+        #define MINMAX_PAIR(v1, v2) std::pair<unsigned int, unsigned int>(std::min(v1, v2), std::max(v1, v2))
 
         for(int i = 0; i < 12; i++)
         {
@@ -435,27 +432,23 @@ void polygonise_cell(const data::Cell &cell, const unsigned int &max_depth, std:
             
             for(int j = 0; j < 12; j++)
             {
-                std::pair<unsigned int, unsigned int> p(__min(i, j), __max(i, j));
+                std::pair<unsigned int, unsigned int> p(std::min(i, j), std::max(i, j));
                 if(i == j || (edgeTable[cubeindex] & (1 << j)) == 0 || edge_verts[i].material == edge_verts[j].material || edge_midpoints.find(p) != edge_midpoints.end())
                     continue;
                 
                 Vertex midpoint = edge_vert_interp(edge_verts[i], edge_verts[j]);
-                assert(midpoint.position != math::Vector3::zero);
                 edge_midpoints.insert(std::make_pair(p, midpoint));
             }
         }
 
         #define ADD_TRI(surf_offset, vert1, vert2, vert3)\
-        assert(vert1 != math::Vector3::zero);\
-        surfaces[edge_verts[triTable[cubeindex][i+##surf_offset]].material].push_back(vert1);\
-        assert(vert2 != math::Vector3::zero);\
-        surfaces[edge_verts[triTable[cubeindex][i+##surf_offset]].material].push_back(vert2);\
-        assert(vert3 != math::Vector3::zero);\
-        surfaces[edge_verts[triTable[cubeindex][i+##surf_offset]].material].push_back(vert3);
+        surfaces[edge_verts[triTable[cubeindex][i+surf_offset]].material].push_back(vert1);\
+        surfaces[edge_verts[triTable[cubeindex][i+surf_offset]].material].push_back(vert2);\
+        surfaces[edge_verts[triTable[cubeindex][i+surf_offset]].material].push_back(vert3);
 
-        #define EDGEPOINT(offset) edge_verts[triTable[cubeindex][i+##offset]].vertex
+        #define EDGEPOINT(offset) edge_verts[triTable[cubeindex][i+offset]].vertex
 
-        #define MIDPOINT(off1, off2) edge_midpoints[MINMAX_PAIR(triTable[cubeindex][i+##off1], triTable[cubeindex][i+##off2])]
+        #define MIDPOINT(off1, off2) edge_midpoints[MINMAX_PAIR(triTable[cubeindex][i+off1], triTable[cubeindex][i+off2])]
 
         for(int i = 0; triTable[cubeindex][i] != -1; i += 3)
         {

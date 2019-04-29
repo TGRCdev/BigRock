@@ -21,12 +21,12 @@ br_real EllipsoidTool::value(const math::Vector3 &pos) const
 math::AABB EllipsoidTool::get_aabb() const
 {
     math::Vector3 grid[8] = {math::Vector3(-1, -1, -1), math::Vector3(1, -1, -1), math::Vector3(-1, 1, -1), math::Vector3(1, 1, -1), math::Vector3(-1, -1, 1), math::Vector3(1, -1, 1), math::Vector3(-1, 1, 1), math::Vector3(1,1,1)};
-    math::Vector3 minpos = transform.to_global(grid[0]);
+    math::Vector3 minpos = transform.to_global(grid[0] * 2);
     math::Vector3 maxpos = minpos;
 
     for(int i = 1; i < 8; i++)
     {
-        math::Vector3 pos = transform.to_global(grid[i]);
+        math::Vector3 pos = transform.to_global(grid[i] * 2);
         if(pos.x < minpos.x)
             minpos.x = pos.x;
         else if(pos.x > maxpos.x)

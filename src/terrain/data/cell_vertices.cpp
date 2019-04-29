@@ -30,8 +30,8 @@ CellVertex CellVertex::interpolate(const CellVertex &other, const float &t) cons
         }
         else
         {
-            br_real begin = abs(this->isovalue);
-            br_real end = -abs(other.isovalue);
+            br_real begin = fabs(this->isovalue);
+            br_real end = -fabs(other.isovalue);
             br_real mat_val = math::lerp(begin, end, t);
             if(mat_val < 0)
                 ret.material = other.material;

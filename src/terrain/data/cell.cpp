@@ -3,6 +3,7 @@
 #include "../grid_vertices.hpp"
 
 #include <set>
+#include <stdlib.h>
 
 namespace bigrock {
 namespace terrain {
@@ -205,22 +206,21 @@ math::AABB Cell::get_aabb() const
 
 void Cell::apply_tool(const Tool &t, const Action &a)
 {
-    for(int i = 0; i < 8; i++)
-        a.update(t, *vertices[i]);
-    
     if(this->subdiv_level < a.max_subdiv_level)
     {
-        math::AABB tool_aabb = t.get_aabb();
-
         if(is_leaf())
             subdivide();
-
+        
+        math::AABB tool_aabb = t.get_aabb();
         for(int i = 0; i < 8; i++)
         {
             if(children[i].get_aabb().intersects(tool_aabb))
                 children[i].apply_tool(t, a);
         }
     }
+
+    for(int i = 0; i < 8; i++)
+        a.update(t, *vertices[i]);
 }
 
 }}}
