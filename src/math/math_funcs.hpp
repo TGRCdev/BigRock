@@ -33,7 +33,7 @@ namespace bigrock
                 return true;
             
             br_real epsilon = std::numeric_limits<br_real>::epsilon();
-            return abs(v2 - v1) < epsilon;
+            return fabs(v2 - v1) < epsilon;
         }
 
         static inline bool sign_changes(const br_real &v1, const br_real &v2)

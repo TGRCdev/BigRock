@@ -13,4 +13,5 @@ doc/
 .sconsign.dblite
 *.exe
 *.o
+*.os
 .DS_Store
