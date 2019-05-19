@@ -100,13 +100,13 @@ void Cell::undivide()
     children = NULL;
 }
 
-Point Cell::sample(const glm::vec3 &point) const
+Point Cell::sample(glm::vec3 point) const
 {
     glm::vec3 t = (point - corners[0]->position) / (corners[7]->position - corners[0]->position);
     return sample_local(t);
 }
 
-Point Cell::sample_local(const glm::vec3 &point) const
+Point Cell::sample_local(glm::vec3 point) const
 {
     Point x_plane[4];
     x_plane[0] = this->corners[0]->interpolate(*this->corners[1], point.x);

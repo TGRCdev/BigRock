@@ -1,4 +1,8 @@
 Import('env', 'sources', 'conf')
 testops = Variables()
 
-env.Program(target='bin/test', source = sources + ['cell_test.cpp'])
+sources += Glob("shared/*.cpp")
+
+progsrc = Glob("*.cpp")
+for prog in progsrc:
+    env.Program(target='bin/' + str(prog)[:-4], source=sources + [prog])

@@ -1,5 +1,5 @@
-sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/")]
-licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/glm-aabb/LICENSE')], "bigrock":[File('LICENSE')]}
+sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools")]
+licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/cpm-glm-aabb/LICENSE')], "bigrock":[File('LICENSE')]}
 
 def positive_validator(key, value, env):
     if int(value) <= 0:
@@ -14,10 +14,6 @@ opts.Add(EnumVariable('build_type', 'The type of build to perform.', 'objects', 
 opts.Add(BoolVariable('make_dir', 'If \'yes\', constructs a library directory under \'lib/\' with the headers and the built library.', False))
 opts.Add(PathVariable('glm_dir', 'The location of the GLM library headers and binaries to link with.', 'C:\\Program Files (x86)\\glm', PathVariable.PathAccept))
 opts.Add(PathVariable('glm_includes', 'The location of the headers for GLM to use.', '', PathVariable.PathAccept))
-opts.Add(BoolVariable('enable_pooling', 'If true, uses object pooling for some terrain data classes.', True))
-opts.Add(BoolVariable('expand_pool', 'If true, fills an extra object pool when the regular pool runs dry.', False))
-opts.Add('point_pool_size', 'Sets the size of the pool for Point objects (Cell corners).', 1024, positive_validator)
-opts.Add('cell_pool_size', 'Sets the size of the pool for Cell objects.', 256, positive_validator)
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -37,10 +33,10 @@ if not bits: # Use host bits as default bits
 
 target_arch = 'x86_64' if bits == '64' else 'x86'
 
-if ARGUMENTS.get('use_mingw', False):
-    env = DefaultEnvironment(TARGET_ARCH = target_arch , tools = ['mingw'])
+if ARGUMENTS.get('use_mingw', False) == 'yes':
+    env = Environment(TARGET_ARCH = target_arch , tools = ['mingw'])
 else:
-    env = DefaultEnvironment(TARGET_ARCH = target_arch)
+    env = Environment(TARGET_ARCH = target_arch)
 opts.Update(env)
 if env['glm_includes'] == '':
     env['glm_includes'] = Dir(env['glm_dir'] + '/include')
@@ -63,6 +59,8 @@ if env['CC'] == 'cl':
     else:
         env.Append(LINKFLAGS = ['/MACHINE:X64'])
 else:
+    if env['use_mingw']:
+        env.Append()
     if env['target'] == 'debug':
         env.Append(CCFLAGS = ['-g'])
     
@@ -70,8 +68,6 @@ else:
         env.Append(CCFLAGS = ['-m32'])
     else:
         env.Append(CCFLAGS = ['-m64'])
-
-env.Append(CPPDEFINES = [("BR_CELL_POOL_SIZE", env['cell_pool_size']), ("BR_POINT_POOL_SIZE", env['point_pool_size'])])
 
 sources = []
 for path in sourcepaths:

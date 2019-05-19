@@ -70,27 +70,6 @@
       "problemMatcher": []
     },
     {
-      "label": "Run Test",
-      "dependsOn": [
-        "Build Test Program"
-      ],
-      "type": "process",
-      "windows": {
-        "command": "test\\bin\\BigRockTest.exe"
-      },
-      "linux": {
-        "command": "test/bin/BigRockTest"
-      },
-      "osx": {
-        "command": "test/bin/BigRockTest"
-      },
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
-      "problemMatcher": []
-    },
-    {
       "label": "Clean Builds",
       "type": "shell",
       "command": "scons",
