@@ -34,9 +34,11 @@ if not bits: # Use host bits as default bits
 target_arch = 'x86_64' if bits == '64' else 'x86'
 
 if ARGUMENTS.get('use_mingw', False) == 'yes':
-    env = Environment(TARGET_ARCH = target_arch , tools = ['mingw'])
+    env = Environment(TARGET_ARCH = target_arch, tools = ['mingw'])
+    env['ENV']['PATH'] += ';C:\\Program Files\\mingw-w64\\x86_64-8.1.0-win32-seh-rt_v6-rev0\\mingw64\\bin'
 else:
     env = Environment(TARGET_ARCH = target_arch)
+
 opts.Update(env)
 if env['glm_includes'] == '':
     env['glm_includes'] = Dir(env['glm_dir'] + '/include')
@@ -46,7 +48,7 @@ conf = Configure(env)
 if not conf.CheckCXXHeader('glm/glm.hpp'):
 	print("ERROR: The OpenGL Mathematics library must be available to build the library.")
 	print("Please download and install GLM to build this library. ( https://glm.g-truc.net/ )")
-	Exit(1)
+	#Exit(1)
 
 env['bits'] = bits
 
@@ -59,8 +61,7 @@ if env['CC'] == 'cl':
     else:
         env.Append(LINKFLAGS = ['/MACHINE:X64'])
 else:
-    if env['use_mingw']:
-        env.Append()
+    env.Append(CCFLAGS = ['-ansi'])
     if env['target'] == 'debug':
         env.Append(CCFLAGS = ['-g'])
     
@@ -68,6 +69,8 @@ else:
         env.Append(CCFLAGS = ['-m32'])
     else:
         env.Append(CCFLAGS = ['-m64'])
+
+env.Append(CPPDEFINES = ['GLM_FORCE_CXX98'])
 
 sources = []
 for path in sourcepaths:

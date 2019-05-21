@@ -7,10 +7,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <list>
 #include <stddef.h>
-
-#if !(defined(_WIN32) || defined(_WIN64))
 #include <string.h> // memcpy
-#endif
 
 namespace bigrock {
 namespace data {
@@ -52,6 +49,10 @@ struct Member
     SerialType type;
 };
 
+// Overload this to use serialization
+template<class T>
+std::list<Member<T> > get_member_list();
+
 template<typename T>
 int serialize_primitive(T val, char *buffer)
 {
@@ -87,11 +88,11 @@ int serialize(const T& object, char *buffer, bool include_prefix = false)
         pos = 2;
     }
 
-    std::list<Member<T>> members = get_member_list<T>();
-    for(std::list<Member<T>>::iterator it = members.begin(); it != members.end(); it++)
+    std::list<Member<T> > members = get_member_list<T>();
+    for(typename std::list<Member<T> >::iterator it = members.begin(); it != members.end(); it++)
     {
         #define SERIALIZE(type) \
-            pos += serialize_primitive<type>(*reinterpret_cast<const type##*>(reinterpret_cast<const char*>(&object) + it->offset), buffer + pos);\
+            pos += serialize_primitive<type>(*reinterpret_cast<const type*>(reinterpret_cast<const char*>(&object) + it->offset), buffer + pos);\
             break
 
         switch(it->type)
@@ -149,12 +150,12 @@ int deserialize(T& object, const char *buffer)
     if(buffer[0] == 'B' && buffer[1] == 'R')
         pos = 2;
     
-    std::list<Member<T>> member_list = get_member_list<T>();
+    std::list<Member<T> > member_list = get_member_list<T>();
 
-    for(std::list<Member<T>>::iterator it = member_list.begin(); it != member_list.end(); it++)
+    for(typename std::list<Member<T> >::iterator it = member_list.begin(); it != member_list.end(); it++)
     {
         #define DESERIALIZE(type)\
-        pos += deserialize_primitive<type>(*reinterpret_cast<type##*>(reinterpret_cast<char*>(&object) + it->offset), buffer + pos);\
+        pos += deserialize_primitive<type>(*reinterpret_cast<type*>(reinterpret_cast<char*>(&object) + it->offset), buffer + pos);\
         break
 
         switch(it->type)
@@ -180,10 +181,6 @@ int deserialize(T& object, const char *buffer)
 
     return pos;
 }
-
-// Overload this to use serialization
-template<class T>
-std::list<Member<T>> get_member_list();
 
 }}
 

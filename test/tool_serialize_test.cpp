@@ -45,7 +45,7 @@ int main()
     for(int i = 0; i < charcount; i++)
     {
         file << buffer[i];
-        cout << buffer[i];
+        cout << buffer[i]; // This does some wacky things sometimes
     }
     
     file.close();
