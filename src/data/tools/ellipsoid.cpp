@@ -23,15 +23,24 @@ std::list<Member<Ellipsoid> > Ellipsoid::members = std::list<Member<Ellipsoid> >
 
 }
 
+#define offset(class, attrib) reinterpret_cast<intptr_t>(&((class*)0)->attrib) // Is it safe? Who knows, but it shuts MinGW up
+
 using namespace tools;
 template<>
 std::list<Member<Ellipsoid> > get_member_list()
 {
     if(Ellipsoid::members.empty())
     {
-        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offsetof(Ellipsoid, transform.origin.x)));
-        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offsetof(Ellipsoid, transform.origin.y)));
-        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offsetof(Ellipsoid, transform.origin.z)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.origin.x)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.origin.y)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.origin.z)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.rotation.x)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.rotation.y)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.rotation.z)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.rotation.w)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.scale.x)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.scale.y)));
+        Ellipsoid::members.push_back(Member<Ellipsoid>(SERIAL_TYPE_FLOAT, offset(Ellipsoid, transform.scale.z)));
     }
     return Ellipsoid::members;
 }

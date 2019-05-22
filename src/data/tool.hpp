@@ -40,7 +40,11 @@ struct Tool
     virtual inline ToolType get_tool_type() const {return TOOL_TYPE_NULL;}
 
     static Tool *new_tool(char tooltype);
+
     static Tool *deserialize_tool(const char *buffer, int *chars_read = NULL);
+
+    /// Adds additional bytes describing the string as a tool, and what tool type it is.
+    static int serialize_tool(const Tool &t, char *buffer, bool include_prefix = false);
 };
 
 }}
