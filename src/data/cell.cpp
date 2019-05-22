@@ -121,4 +121,10 @@ Point Cell::sample_local(glm::vec3 point) const
     return y_plane[0].interpolate(y_plane[1], point.z);
 }
 
+template<>
+std::list<Member<Cell> > get_member_list()
+{
+    
+}
+
 }}

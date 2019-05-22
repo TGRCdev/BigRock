@@ -33,20 +33,30 @@ enum SerialType
     SERIAL_TYPE_BOOL,
     SERIAL_TYPE_CHAR,
     SERIAL_TYPE_UCHAR,
-    SERIAL_TYPE_FLOAT
+    SERIAL_TYPE_FLOAT,
+    SERIAL_TYPE_SPECIAL // Special cases for pointers and such
 };
+
+#define GET_OFFSET(class, attrib) reinterpret_cast<intptr_t>(&((class*)0)->attrib) // Is it safe? Who knows, but it shuts MinGW up
 
 template<class T>
 struct Member
 {
-    Member(SerialType type, size_t offset)
-    {
-        this->type = type;
-        this->offset = offset;
-    }
+    Member(SerialType type, size_t offset);
+    Member(int T::*member);
+    Member(unsigned int T::*member);
+    Member(long T::*member);
+    Member(unsigned long T::*member);
+    Member(bool T::*member);
+    Member(char T::*member);
+    Member(unsigned char T::*member);
+    Member(float T::*member);
+    Member(size_t offset, int(*serfunc)(const void*, char*), int(*deserfunc)(void*, const char*));
 
     size_t offset;
     SerialType type;
+    int (*serfunc)(const void*, char*); // Special serialize function
+    int (*deserfunc)(void*, const char*); // Special deserialize function
 };
 
 // Overload this to use serialization
@@ -72,6 +82,15 @@ int serialize_primitive(T val, char *buffer)
             buffer[i] = data.bytes[sizeof(T) - (1 + i)];
     }
     return sizeof(T);
+}
+
+template<class T>
+int serialize(const T& object, char *buffer, bool include_prefix = false);
+
+template<class T>
+int serialize(const void* object, char *buffer)
+{
+    return serialize(static_cast<const T>(actual_obj), buffer);
 }
 
 template<class T>
@@ -113,6 +132,9 @@ int serialize(const T& object, char *buffer, bool include_prefix = false)
             SERIALIZE(unsigned char);
             case SERIAL_TYPE_FLOAT:
             SERIALIZE(float);
+            case SERIAL_TYPE_SPECIAL:
+            pos += it->serfunc(reinterpret_cast<const void*>(reinterpret_cast<const char*>(&object) + it->offset), buffer);
+            break;
         }
     }
 
@@ -138,6 +160,12 @@ int deserialize_primitive(T& member, const char *buffer)
         member = data.val;
     }
     return sizeof(T);
+}
+
+template<class T>
+int deserialize(void *object, const char *buffer)
+{
+    return deserialize(static_cast<T>(actual_obj), buffer);
 }
 
 template<class T>
@@ -176,6 +204,9 @@ int deserialize(T& object, const char *buffer)
             DESERIALIZE(unsigned char);
             case SERIAL_TYPE_FLOAT:
             DESERIALIZE(float);
+            case SERIAL_TYPE_SPECIAL:
+            pos += it->deserfunc(reinterpret_cast<void*>(reinterpret_cast<char*>(&object) + it->offset), buffer);
+            break;
         }
     }
 

@@ -1,0 +1,71 @@
+#include "serialize.hpp"
+
+namespace bigrock {
+namespace data {
+
+#define get_offset(class, member_p) reinterpret_cast<intptr_t>(&((class*)0)->*member_p)
+template<class T>
+Member<T>::Member(SerialType type, size_t offset)
+{
+    this->type = type;
+    this->offset = offset;
+}
+template<class T>
+Member<T>::Member(int T::*member)
+{
+    this->type = SERIAL_TYPE_INT;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(unsigned int T::*member)
+{
+    this->type = SERIAL_TYPE_UINT;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(long T::*member)
+{
+    this->type = SERIAL_TYPE_LONG;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(unsigned long T::*member)
+{
+    this->type = SERIAL_TYPE_ULONG;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(bool T::*member)
+{
+    this->type = SERIAL_TYPE_BOOL;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(char T::*member)
+{
+    this->type = SERIAL_TYPE_CHAR;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(unsigned char T::*member)
+{
+    this->type = SERIAL_TYPE_UCHAR;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(float T::*member)
+{
+    this->type = SERIAL_TYPE_FLOAT;
+    this->offset = get_offset(T, member);
+}
+template<class T>
+Member<T>::Member(size_t offset, int(*serfunc)(const void*, char*), int(*deserfunc)(void*, const char*))
+{
+    this->type = SERIAL_TYPE_SPECIAL;
+    this->offset = offset;
+    this->serfunc = serfunc;
+    this->deserfunc = deserfunc;
+}
+#undef get_offset
+
+}}
