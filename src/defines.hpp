@@ -3,7 +3,7 @@
 #pragma once
 
 #ifndef BR_DEFAULT_MAX_SUBDIV
-#define BR_DEFAULT_MAX_SUBDIV 4
+#define BR_DEFAULT_MAX_SUBDIV 64
 #endif
 
 #endif

@@ -27,3 +27,5 @@ test/src/resources/images/*.h
 test/src/resources/images/*.cpp
 .vscode/ipch/
 *.dat
+src/data/schemas/*.h
+*.bin

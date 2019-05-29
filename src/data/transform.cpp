@@ -38,6 +38,16 @@ namespace data {
         this->scale = other.scale;
     }
 
+    Transform::Transform(const schemas::Transform *trns) : Transform()
+    {
+        if(trns)
+        {
+            this->origin = glm::vec3(trns->origin().x(), trns->origin().y(), trns->origin().z());
+            this->rotation = glm::quat(trns->rotation().x(), trns->rotation().y(), trns->rotation().z(), trns->rotation().w());
+            this->scale = glm::vec3(trns->scale().x(), trns->scale().y(), trns->scale().z());
+        }
+    }
+
     glm::vec3 Transform::to_local(glm::vec3 point) const
     {
         return glm::inverse(glm::mat4(*this)) * glm::vec4(point, 1.0f);
@@ -51,6 +61,15 @@ namespace data {
     Transform::operator glm::mat4() const
     {
         return glm::scale(glm::translate(glm::identity<glm::mat4>(), origin) * glm::toMat4(glm::normalize(rotation)), scale);
+    }
+
+    Transform::operator schemas::Transform() const
+    {
+        return schemas::Transform(
+            schemas::Vec3(origin.x, origin.y, origin.z),
+            schemas::Vec4(rotation.x, rotation.y, rotation.z, rotation.w),
+            schemas::Vec3(scale.x, scale.y, scale.z)
+        );
     }
 
     const Transform Transform::identity = Transform();

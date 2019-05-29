@@ -1,6 +1,6 @@
 #include "tool.hpp"
 #include "../grid_vertices.hpp"
-#include "serialize.hpp"
+#include "schemas/tool_generated.h"
 
 // Tools
 #include "tools/ellipsoid.hpp"
@@ -13,17 +13,6 @@ float Tool::value(glm::vec3 point) const
     return value_local(transform.to_local(point));
 }
 
-Tool *Tool::new_tool(char tooltype)
-{
-    switch(tooltype)
-    {
-        case TOOL_TYPE_ELLIPSOID:
-            return new tools::Ellipsoid();
-        default:
-            return NULL;
-    }
-}
-
 AABB Tool::get_aabb() const
 {
     AABB ret;
@@ -32,68 +21,47 @@ AABB Tool::get_aabb() const
     return ret;
 }
 
-Tool *Tool::deserialize_tool(const char *buffer, int *chars_read)
+std::string Tool::serialize() const
 {
-    if(chars_read)
-        *chars_read = 0;
-
-    if(!buffer)
-        return NULL;
-
-    unsigned int pos = 0;
-    if(buffer[0] == 'B' && buffer[1] == 'R')
-        pos = 2;
-    
-    if(buffer[pos++] != 'T')
-        return NULL;
-
-    Tool *t;
-
-    switch(buffer[pos++])
+    schemas::ToolType ttype;
+    switch(get_tool_type())
     {
         case TOOL_TYPE_ELLIPSOID:
-        {
-            t = new Ellipsoid();
-            pos += deserialize<Ellipsoid>(*static_cast<Ellipsoid*>(t), buffer+pos);
-            break;
-        }
+        ttype = schemas::ToolType_Ellipsoid;
+        break;
         default:
-        {
-            t = NULL;
-            pos = 0;
-            break;
-        }
+        return std::string();
     }
-
-    if(chars_read)
-        *chars_read = pos;
-    return t;
+    flatbuffers::FlatBufferBuilder builder;
+    schemas::Transform trns = transform;
+    auto tool = schemas::CreateTool(builder, &trns, ttype);
+    builder.Finish(tool);
+    return std::string(reinterpret_cast<char*>(builder.GetBufferPointer()), static_cast<size_t>(builder.GetSize()));
 }
 
-int Tool::serialize_tool(const Tool &t, char *buffer, bool include_prefix)
+std::unique_ptr<Tool> Tool::deserialize(const void *buf, size_t length)
 {
-    if(!buffer)
-        return 0;
+    if(buf == NULL)
+        return nullptr;
+    flatbuffers::Verifier v = flatbuffers::Verifier(reinterpret_cast<const uint8_t*>(buf), length);
+    bool ok = schemas::VerifyToolBuffer(v);
+    if(!ok)
+        return nullptr;
     
-    if(t.get_tool_type() == TOOL_TYPE_NULL)
-        return 0;
+    auto tool = schemas::GetTool(buf);
+    Tool *newtool = NULL;
+    switch(tool->tool_type())
+    {
+        case schemas::ToolType_Ellipsoid:
+        newtool = new tools::Ellipsoid();
+        break;
+    }
+
+    if(!newtool)
+        return nullptr;
     
-    unsigned int chars = 0;
-    if(include_prefix)
-    {
-        buffer[chars++] = 'B';
-        buffer[chars++] = 'R';
-    }
-    buffer[chars++] = 'T';
-    buffer[chars++] = t.get_tool_type();
-    switch(t.get_tool_type())
-    {
-        case TOOL_TYPE_ELLIPSOID:
-        {
-            chars += serialize<Ellipsoid>(*reinterpret_cast<const Ellipsoid*>(&t), buffer + chars, false);
-        }
-    }
-    return chars;
+    newtool->transform = tool->transform();
+    return std::unique_ptr<Tool>(newtool);
 }
 
 }}

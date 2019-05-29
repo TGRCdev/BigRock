@@ -1,5 +1,5 @@
 sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools")]
-licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/cpm-glm-aabb/LICENSE')], "bigrock":[File('LICENSE')]}
+licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/cpm-glm-aabb/LICENSE')], "flatbuffers":[File('thirdparty/flatbuffers/LICENSE.txt')], "bigrock":[File('LICENSE')]}
 
 def positive_validator(key, value, env):
     if int(value) <= 0:
@@ -10,10 +10,14 @@ opts = Variables()
 opts.Add(EnumVariable('target', 'The build target', 'debug', ['release', 'debug'], ignorecase=2))
 opts.Add(EnumVariable('bits', 'The target bits', '', ['32', '64', '']))
 opts.Add(BoolVariable('use_mingw', 'Set to \'yes\' to use MinGW on Windows machines.', False))
-opts.Add(EnumVariable('build_type', 'The type of build to perform.', 'objects', ['objects', 'static', 'shared', 'dynamic', 'test'], ignorecase=2))
+opts.Add(EnumVariable('build_type', 'The type of build to perform.', 'objects', ['objects', 'schemas', 'static', 'shared', 'dynamic', 'test'], ignorecase=2))
 opts.Add(BoolVariable('make_dir', 'If \'yes\', constructs a library directory under \'lib/\' with the headers and the built library.', False))
 opts.Add(PathVariable('glm_dir', 'The location of the GLM library headers and binaries to link with.', 'C:\\Program Files (x86)\\glm', PathVariable.PathAccept))
 opts.Add(PathVariable('glm_includes', 'The location of the headers for GLM to use.', '', PathVariable.PathAccept))
+opts.Add(PathVariable('flatbuffers_dir', 'The location of the FlatBuffers binaries, headers and the flatc compiler.', 'C:\\Program Files (x86)\\flatbuffers', PathVariable.PathAccept))
+opts.Add(PathVariable('flatbuffers_includes', 'The location of the FlatBuffers headers directory.', '', PathVariable.PathAccept))
+opts.Add(PathVariable('flatbuffers_libs', 'The location of the FlatBuffers binaries directory.', '', PathVariable.PathAccept))
+opts.Add(PathVariable('flatc_path', 'The path to the FlatBuffers schema compiler.', '', PathVariable.PathAccept))
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -44,11 +48,19 @@ if env['glm_includes'] == '':
     env['glm_includes'] = Dir(env['glm_dir'] + '/include')
 env.Append(CPPPATH = [env['glm_includes']])
 
+if env['flatbuffers_includes'] == '':
+    env['flatbuffers_includes'] = env['flatbuffers_dir'] + '/include'
+if env['flatbuffers_libs'] == '':
+    env['flatbuffers_libs'] = env['flatbuffers_dir'] + '/lib'
+if env['flatc_path'] == '':
+    env['flatc_path'] = env['flatbuffers_dir'] + '/bin/flatc'
+env.Append(CPPPATH = [env['flatbuffers_includes']], LIBPATH = [env['flatbuffers_libs']], LIBS = 'flatbuffers')
+
 conf = Configure(env)
 if not conf.CheckCXXHeader('glm/glm.hpp'):
 	print("ERROR: The OpenGL Mathematics library must be available to build the library.")
 	print("Please download and install GLM to build this library. ( https://glm.g-truc.net/ )")
-	#Exit(1)
+	Exit(1)
 
 env['bits'] = bits
 
@@ -61,7 +73,7 @@ if env['CC'] == 'cl':
     else:
         env.Append(LINKFLAGS = ['/MACHINE:X64'])
 else:
-    env.Append(CCFLAGS = ['-ansi'])
+    #env.Append(CCFLAGS = ['-ansi'])
     if env['target'] == 'debug':
         env.Append(CCFLAGS = ['-g'])
     
@@ -70,7 +82,7 @@ else:
     else:
         env.Append(CCFLAGS = ['-m64'])
 
-env.Append(CPPDEFINES = ['GLM_FORCE_CXX98'])
+env.Append(CPPDEFINES = ['GLM_FORCE_CXX11'])
 
 sources = []
 for path in sourcepaths:
@@ -80,16 +92,22 @@ targetname = 'bin/BigRock' + env['bits']
 if env['target'] == 'debug':
     targetname += '-Debug'
 
+# Setup schemas
+schemas = Glob("src/data/schemas/*.fbs")
+sch = []
+for schema in schemas:
+    sch += env.Command(str(schema)[:-4] + '_generated.h', schema, '"' + env['flatc_path'] + env['PROGSUFFIX'] + '" -o src/data/schemas -I src/data/schemas --cpp $SOURCE')
+
 lib = None
 if env['build_type'] == 'static':
-    lib = env.StaticLibrary(target = targetname, source = sources)
+    lib = Requires(env.StaticLibrary(target = targetname, source = sources), sch)
 elif env['build_type'] == 'dynamic' or env['build_type'] == 'shared':
-    lib = env.SharedLibrary(target = targetname, source = sources)
+    lib = Requires(env.SharedLibrary(target = targetname, source = sources), sch)
 elif env['build_type'] == 'test':
     Export('env', 'sources', 'conf')
-    env.SConscript('test/SCSub')
-else:
-    env.Object(source=sources)
+    Requires(env.SConscript('test/SCSub'), sch)
+elif env['build_type'] == 'objects':
+    Requires(env.Object(source=sources), sch)
 
 if env['make_dir']:
     if lib:

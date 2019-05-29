@@ -14,6 +14,14 @@ Point::Point()
     this->material = 0;
 }
 
+Point::Point(const schemas::Point &point)
+{
+    this->isovalue = point.isovalue();
+    auto p = point.position();
+    this->position = glm::vec3(p->x(), p->y(), p->z());
+    this->material = point.material();
+}
+
 Point Point::interpolate(const Point &other, const float &t) const
 {
     if(t <= 0)

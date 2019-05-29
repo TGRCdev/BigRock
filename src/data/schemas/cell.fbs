@@ -1,0 +1,15 @@
+// Schema file for Cell objects
+
+include "common.fbs";
+include "point.fbs";
+
+namespace schemas;
+
+table Cell
+{
+    corners:[Point];
+    children:[Cell];
+    owned_vertices:byte;
+}
+
+root_type Cell;

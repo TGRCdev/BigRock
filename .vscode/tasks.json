@@ -5,21 +5,39 @@
       "label": "Build Objects",
       "type": "shell",
       "command": "scons",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": ["$msCompile"]
+      "args": [
+        "build_type=objects"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$msCompile"
+      ]
     },
     {
       "label": "Build Objects (MinGW)",
       "type": "shell",
       "command": "scons",
-      "group": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "args": [
-        "use_mingw=yes"
+        "use_mingw=yes",
+        "build_type=objects"
       ],
-      "problemMatcher": ["$gcc"]
+      "problemMatcher": [
+        "$gcc"
+      ]
+    },
+    {
+      "label": "Compile Schemas",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=schemas"
+      ],
+      "group":"build",
+      "problemMatcher": []
     },
     {
       "label": "Make Static Library",
@@ -30,7 +48,9 @@
         "make_dir=yes"
       ],
       "group": "build",
-      "problemMatcher": ["$msCompile"]
+      "problemMatcher": [
+        "$msCompile"
+      ]
     },
     {
       "label": "Make Static Library (MinGW)",
@@ -42,7 +62,9 @@
         "use_mingw=yes"
       ],
       "group": "build",
-      "problemMatcher": ["$gcc"]
+      "problemMatcher": [
+        "$gcc"
+      ]
     },
     {
       "label": "Build Test Program",
@@ -52,7 +74,9 @@
         "build_type=test"
       ],
       "group": "build",
-      "problemMatcher": ["$msCompile"]
+      "problemMatcher": [
+        "$msCompile"
+      ]
     },
     {
       "label": "Build Test Program (MinGW)",
@@ -63,7 +87,9 @@
         "use_mingw=yes"
       ],
       "group": "build",
-      "problemMatcher": ["$gcc"]
+      "problemMatcher": [
+        "$gcc"
+      ]
     },
     {
       "label": "Clean Test Program",

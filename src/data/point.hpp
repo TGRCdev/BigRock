@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 
 #include "../defines.hpp"
+#include "schemas/point_generated.h"
 
 namespace bigrock {
 namespace data {
@@ -12,6 +13,7 @@ namespace data {
 struct Point
 {
     Point();
+    Point(const schemas::Point &point);
 
     glm::vec3 position;
     float isovalue; // TODO: See if half float can be used here

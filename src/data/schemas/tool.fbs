@@ -1,0 +1,13 @@
+include "common.fbs";
+
+namespace schemas;
+
+enum ToolType : byte {Ellipsoid}
+
+table Tool
+{
+    transform:Transform;
+    tool_type:ToolType;
+}
+
+root_type Tool;

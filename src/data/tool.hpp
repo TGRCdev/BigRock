@@ -4,7 +4,9 @@
 
 #include "transform.hpp"
 #include "AABB.hpp"
-#include "serialize.hpp"
+
+#include <string>
+#include <memory>
 
 namespace bigrock {
 namespace data {
@@ -12,14 +14,6 @@ namespace data {
 /// CSG tool for modifying terrain
 struct Tool
 {
-    /// When extending, keep in mind:
-    /// - Default constructor
-    /// - Serialize function
-    /// - Deserialize function
-    /// - value_local
-    /// - get_aabb
-    /// - get_tool_type
-
     Transform transform;
 
     /// Returns the density of the point in the tool transformed by the tool's transform
@@ -33,18 +27,16 @@ struct Tool
 
     enum ToolType
     {
-        TOOL_TYPE_NULL = '\0',
-        TOOL_TYPE_ELLIPSOID = 'E'
+        TOOL_TYPE_ELLIPSOID
     };
 
-    virtual inline ToolType get_tool_type() const {return TOOL_TYPE_NULL;}
+    virtual ToolType get_tool_type() const = 0;
 
-    static Tool *new_tool(char tooltype);
+    /// Returns a UTF-8 string with the encoded object.
+    /// Returns an empty string on error.
+    std::string serialize() const;
 
-    static Tool *deserialize_tool(const char *buffer, int *chars_read = NULL);
-
-    /// Adds additional bytes describing the string as a tool, and what tool type it is.
-    static int serialize_tool(const Tool &t, char *buffer, bool include_prefix = false);
+    static std::unique_ptr<Tool> deserialize(const void *buf, size_t length);
 };
 
 }}

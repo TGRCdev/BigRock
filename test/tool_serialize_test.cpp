@@ -14,18 +14,18 @@ using namespace tools;
 
 int main()
 {
-    cout << "Tool Test" << endl;
+    cout << "Tool Serialize Test" << endl;
     fstream ifile("ellipsoid.dat", ios::binary | ios::in);
-    Tool *tool;
+    std::unique_ptr<Tool> tool;
     if(ifile.is_open())
     {
         stringstream sbuff;
         sbuff << ifile.rdbuf();
         string buff = sbuff.str();
         //deserialize<Ellipsoid>(tool, buff.c_str());
-        tool = Tool::deserialize_tool(buff.c_str());
+        tool = Tool::deserialize(buff.c_str(), buff.length());
         cout << "Input String: " << buff << endl;
-        if(tool != NULL)
+        if(tool)
         {
             cout << "Input Tool: (" << tool->transform.origin.x << ", " << tool->transform.origin.y << ", " << tool->transform.origin.z << ")" << endl;
         }
@@ -34,9 +34,8 @@ int main()
             cout << "Failed to load tool from file" << endl;
         }
         ifile.close();
-        delete tool;
     }
-    tool = new Ellipsoid();
+    tool.reset(new Ellipsoid());
     srand(time(NULL));
     rand();
     tool->transform.origin = glm::vec3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));
@@ -44,20 +43,18 @@ int main()
     tool->transform.scale = glm::vec3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));
     cout << "Output Tool: (" << tool->transform.origin.x << ", " << tool->transform.origin.y << ", " << tool->transform.origin.z << ")" << endl;
     fstream file("ellipsoid.dat", ios::binary | ios::out);
-    char buffer[50];
-    int charcount = Tool::serialize_tool(*tool, buffer, true);
-    if(charcount < 0)
+    std::string buffer = tool->serialize();
+    if(buffer.empty())
     {
         cout << "Failed to serialize" << endl;
         return 1;
     }
     cout << "Output String: ";
-    for(int i = 0; i < charcount; i++)
-    {
-        file << buffer[i];
-        cout << buffer[i]; // This does some wacky things sometimes
-    }
+    cout << buffer << endl;
+    cout << "Output String Size: " << buffer.length() << endl;
+    cout << "Tool Size: " << sizeof(Ellipsoid) << endl;
     
+    file.write(&buffer[0], buffer.length());
     file.close();
-    cout << endl;
+    return 0;
 }
