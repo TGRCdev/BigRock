@@ -9,7 +9,7 @@ namespace bigrock {
 namespace data {
 namespace tools {
 
-float Ellipsoid::value_local(glm::vec3 point) const
+float Ellipsoid::value_local(Vector3 point) const
 {
     // return (2.0 * (1.0 - ((22.0/9.0) * dist_sqr) + ((17.0/9.0) * (dist_sqr * dist_sqr)) - ((4.0/9.0) * (dist_sqr * dist_sqr * dist_sqr)))) - 1.0;
     float dist_sqr = glm::length2(point);

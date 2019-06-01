@@ -8,7 +8,7 @@
 namespace bigrock {
 namespace data {
 
-float Tool::value(glm::vec3 point) const
+float Tool::value(Vector3 point) const
 {
     return value_local(transform.to_local(point));
 }
@@ -17,7 +17,7 @@ AABB Tool::get_aabb() const
 {
     AABB ret;
     for(int i = 0; i < 8; i++)
-        ret.extend(GRID_VERTICES[i] - glm::vec3(0.5f));
+        ret.extend(GRID_VERTICES[i] - Vector3(0.5f));
     return ret;
 }
 
@@ -33,7 +33,7 @@ std::string Tool::serialize() const
         return std::string();
     }
     flatbuffers::FlatBufferBuilder builder;
-    schemas::Transform trns = transform;
+    schemas::Transformf trns = transform;
     auto tool = schemas::CreateTool(builder, &trns, ttype);
     builder.Finish(tool);
     return std::string(reinterpret_cast<char*>(builder.GetBufferPointer()), static_cast<size_t>(builder.GetSize()));

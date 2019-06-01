@@ -1,4 +1,4 @@
-Import('env', 'sources', 'conf')
+Import('env', 'sources')
 testops = Variables()
 
 sources += Glob("shared/*.cpp")

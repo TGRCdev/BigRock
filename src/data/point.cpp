@@ -10,15 +10,12 @@ namespace data {
 Point::Point()
 {
     this->isovalue = -1.0f;
-    this->position = glm::vec3(0.0f,0.0f,0.0f);
     this->material = 0;
 }
 
 Point::Point(const schemas::Point &point)
 {
     this->isovalue = point.isovalue();
-    auto p = point.position();
-    this->position = glm::vec3(p->x(), p->y(), p->z());
     this->material = point.material();
 }
 
@@ -31,7 +28,6 @@ Point Point::interpolate(const Point &other, const float &t) const
     else
     {
         Point ret;
-        ret.position = glm::mix(this->position, other.position, t);
         ret.isovalue = glm::mix(this->isovalue, other.isovalue, t);
         if(this->material == other.material)
             ret.material = this->material;

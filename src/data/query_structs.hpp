@@ -16,7 +16,7 @@ struct ToolQueryResult
 struct RayQueryResult
 {
     bool hit;
-    glm::vec3 pos;
+    Vector3 pos;
     unsigned int material;
 };
 

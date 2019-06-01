@@ -18,6 +18,8 @@ opts.Add(PathVariable('flatbuffers_dir', 'The location of the FlatBuffers binari
 opts.Add(PathVariable('flatbuffers_includes', 'The location of the FlatBuffers headers directory.', '', PathVariable.PathAccept))
 opts.Add(PathVariable('flatbuffers_libs', 'The location of the FlatBuffers binaries directory.', '', PathVariable.PathAccept))
 opts.Add(PathVariable('flatc_path', 'The path to the FlatBuffers schema compiler.', '', PathVariable.PathAccept))
+opts.Add(BoolVariable('use_doubles', 'If \'yes\', uses double precision numbers for positions and isovalues.', False))
+opts.Add('max_cell_depth', 'The max depth that terrain cells are allowed to subdivide to.', 24, positive_validator)
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -56,11 +58,15 @@ if env['flatc_path'] == '':
     env['flatc_path'] = env['flatbuffers_dir'] + '/bin/flatc'
 env.Append(CPPPATH = [env['flatbuffers_includes']], LIBPATH = [env['flatbuffers_libs']], LIBS = 'flatbuffers')
 
-conf = Configure(env)
-if not conf.CheckCXXHeader('glm/glm.hpp'):
-	print("ERROR: The OpenGL Mathematics library must be available to build the library.")
-	print("Please download and install GLM to build this library. ( https://glm.g-truc.net/ )")
-	Exit(1)
+if env['use_doubles']:
+    env.Append(CPPDEFINES = 'BR_USE_DOUBLE_PRECISION')
+
+## This only works half of the time and it's really god damn annoying
+# conf = Configure(env)
+# if not conf.CheckCXXHeader('glm/glm.hpp'):
+# 	print("ERROR: The OpenGL Mathematics library must be available to build the library.")
+# 	print("Please download and install GLM to build this library. ( https://glm.g-truc.net/ )")
+# 	Exit(1)
 
 env['bits'] = bits
 
@@ -82,7 +88,7 @@ else:
     else:
         env.Append(CCFLAGS = ['-m64'])
 
-env.Append(CPPDEFINES = ['GLM_FORCE_CXX11'])
+env.Append(CPPDEFINES = ['GLM_FORCE_CXX11', ('BR_MAX_CELL_DEPTH', env['max_cell_depth'])])
 
 sources = []
 for path in sourcepaths:
@@ -104,7 +110,7 @@ if env['build_type'] == 'static':
 elif env['build_type'] == 'dynamic' or env['build_type'] == 'shared':
     lib = Requires(env.SharedLibrary(target = targetname, source = sources), sch)
 elif env['build_type'] == 'test':
-    Export('env', 'sources', 'conf')
+    Export('env', 'sources')
     Requires(env.SConscript('test/SCSub'), sch)
 elif env['build_type'] == 'objects':
     Requires(env.Object(source=sources), sch)
@@ -119,3 +125,5 @@ if env['make_dir']:
         env.Install('lib/lib', lib)
     else:
         print("WARN: make_dir only works when building a library")
+
+Help(opts.GenerateHelpText(env))

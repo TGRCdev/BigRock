@@ -4,7 +4,6 @@ namespace schemas;
 
 table Point // Cannot be a struct because Cell corners are shared
 {
-    position:Vec3;
     isovalue:float = -1.0;
     material:uint8;
 }

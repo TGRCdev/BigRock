@@ -15,7 +15,6 @@ struct Point
     Point();
     Point(const schemas::Point &point);
 
-    glm::vec3 position;
     float isovalue; // TODO: See if half float can be used here
     unsigned char material;
 

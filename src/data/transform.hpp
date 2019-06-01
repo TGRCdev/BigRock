@@ -7,27 +7,31 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "schemas/common_generated.h"
+#include "../defines.hpp"
 
 namespace bigrock {
 namespace data {
     struct Transform
     {
         Transform();
-        Transform(glm::vec3 origin);
-        Transform(glm::vec3 origin, glm::quat rotation);
-        Transform(glm::vec3 origin, glm::quat rotation, glm::vec3 scale);
+        Transform(Vector3 origin);
+        Transform(Vector3 origin, Quat rotation);
+        Transform(Vector3 origin, Quat rotation, Vector3 scale);
         Transform(const Transform &other);
-        Transform(const schemas::Transform *trns);
 
-        glm::vec3 origin;
-        glm::quat rotation;
-        glm::vec3 scale;
+        Transform(const schemas::Transformf *trns);
+        Transform(const schemas::Transformd *trns);
+
+        Vector3 origin;
+        Quat rotation;
+        Vector3 scale;
         
-        glm::vec3 to_global(glm::vec3 point) const;
-        glm::vec3 to_local(glm::vec3 point) const;
+        Vector3 to_global(Vector3 point) const;
+        Vector3 to_local(Vector3 point) const;
 
-        operator glm::mat4() const;
-        operator schemas::Transform() const;
+        operator Mat4() const;
+        operator schemas::Transformf() const;
+        operator schemas::Transformd() const;
 
         static const Transform identity;
     };

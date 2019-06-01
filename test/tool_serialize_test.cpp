@@ -1,5 +1,6 @@
 #include "../src/data/tools/ellipsoid.hpp"
 #include "shared/common.h"
+#include "../src/defines.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -38,9 +39,9 @@ int main()
     tool.reset(new Ellipsoid());
     srand(time(NULL));
     rand();
-    tool->transform.origin = glm::vec3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));
-    //tool.transform.origin = glm::vec3(28.7011f);
-    tool->transform.scale = glm::vec3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));
+    tool->transform.origin = Vector3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));
+    //tool.transform.origin = Vector3(28.7011f);
+    tool->transform.scale = Vector3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));
     cout << "Output Tool: (" << tool->transform.origin.x << ", " << tool->transform.origin.y << ", " << tool->transform.origin.z << ")" << endl;
     fstream file("ellipsoid.dat", ios::binary | ios::out);
     std::string buffer = tool->serialize();
