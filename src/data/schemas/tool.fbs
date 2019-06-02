@@ -6,7 +6,7 @@ enum ToolType : byte {Ellipsoid}
 
 table Tool
 {
-    transform:Transformf;
+    transform:Transform;
     tool_type:ToolType;
 }
 

@@ -3,8 +3,6 @@
 #include "../grid_vertices.hpp"
 #include "../defines.hpp"
 
-#include <iostream>
-
 namespace bigrock {
 namespace data {
 
@@ -90,12 +88,10 @@ Cell::Cell(const schemas::CellRoot &cell)
     this->position = Vector3();
     this->cell_count = new unsigned int(1);
     this->subdiv_level = 0;
-    std::cout << "Cell Precision: " << schemas::EnumNameCell(cell.root_type()) << std::endl;
     if(cell.root_type() == schemas::Cell_CellSingle)
         this->load(*reinterpret_cast<const schemas::CellSingle*>(cell.root()), p);
     else if(cell.root_type() == schemas::Cell_CellDouble)
         this->load(*reinterpret_cast<const schemas::CellDouble*>(cell.root()), p);
-    std::cout << "Total points: " << p.size() << std::endl;
 }
 
 template <class T>
@@ -198,10 +194,32 @@ void Cell::undivide()
     *cell_count -= 8;
 }
 
-Point Cell::sample(Vector3 point) const
+int Cell::get_index_containing_pos(const Vector3 pos) const
 {
-    Vector3 t = (point - position) / (this->get_corner_pos(7) - position);
-    return sample_local(t);
+    Vector3 midpoint = glm::mix(get_corner_pos(0), get_corner_pos(7), 0.5);
+    int index = 0;
+
+    if(pos.x > midpoint.x)
+        index |= 1;
+    if(pos.y > midpoint.y)
+        index |= 2;
+    if(pos.z > midpoint.z)
+        index |= 4;
+
+    return index;
+}
+
+Point Cell::sample(Vector3 point, bool recursive) const
+{
+    if(has_children() && recursive)
+    {
+        return children[get_index_containing_pos(point)].sample(point, true);
+    }
+    else
+    {
+        Vector3 t = (point - position) / (this->get_corner_pos(7) - position);
+        return sample_local(t);
+    }
 }
 
 Point Cell::sample_local(Vector3 point) const
@@ -217,6 +235,40 @@ Point Cell::sample_local(Vector3 point) const
     y_plane[1] = x_plane[2].interpolate(x_plane[3], point.y);
 
     return y_plane[0].interpolate(y_plane[1], point.z);
+}
+
+AABB Cell::get_aabb() const
+{
+    AABB ret;
+    ret.extend(get_corner_pos(0));
+    ret.extend(get_corner_pos(7));
+    return ret;
+}
+
+ToolQueryResult Cell::apply(const Tool &t, const Action &a, const int max_depth) // TODO: Tool application thread?
+{
+    for(int i = 0; i < 8; i++)
+        if(owns_corner(i))
+            a.update(t, get_corner_pos(i), get_corner(i));
+    
+    if(!has_children() && (max_depth == -1 || subdiv_level < max_depth))
+        if(t.is_concave())
+        {
+            if(t.get_max_depth() == -1 || t.get_max_depth() > subdiv_level)
+                subdivide();
+        }
+        else // convex
+        {
+            if(t.get_aabb().intersect(this->get_aabb()) == AABB::INTERSECT) // Only need surface detail for convex shapes
+                subdivide();
+        }
+    
+    if(has_children() && (max_depth == -1 || subdiv_level < max_depth))
+        for(int i = 0; i < 8; i++)
+            if(children[i].get_aabb().intersect(t.get_aabb()) != AABB::OUTSIDE)
+                children[i].apply(t, a, max_depth);
+    
+    return ToolQueryResult(); // TODO
 }
 
 Offset<CellType> Cell::serialize(FlatBufferBuilder &builder, std::map<const Point*, Offset<schemas::Point> > &point_offsets) const
@@ -276,8 +328,6 @@ std::unique_ptr<std::string> Cell::serialize() const
     std::map<const Point*, Offset<schemas::Point> > point_offsets;
     FlatBufferBuilder builder((*cell_count * sizeof(CellType)) + sizeof(schemas::CellRoot));
     auto cell_offs = serialize(builder, point_offsets);
-    std::cout << "Output precision: " << schemas::EnumNameCell(CellTag) << std::endl;
-    std::cout << "Output points: " << point_offsets.size() << std::endl;
     auto offs = schemas::CreateCellRoot(builder, CellTag, cell_offs.Union());
     builder.Finish(offs);
     return std::unique_ptr<std::string>(new std::string(reinterpret_cast<char*>(builder.GetBufferPointer()), builder.GetSize()));

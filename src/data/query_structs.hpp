@@ -2,6 +2,8 @@
 #define BIGROCK_QUERY_STRUCTS_H
 #pragma once
 
+#include "../defines.hpp"
+
 #include <map>
 #include <glm/vec3.hpp>
 

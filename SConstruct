@@ -1,6 +1,6 @@
 import platform
 
-sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools")]
+sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools"), Dir("src/data/actions")]
 licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/cpm-glm-aabb/LICENSE')], "flatbuffers":[File('thirdparty/flatbuffers/LICENSE.txt')], "bigrock":[File('LICENSE')]}
 
 def positive_validator(key, value, env):
@@ -53,7 +53,6 @@ if env['glm_dir'] == '':
     if platform.system() == 'Windows':
         env['glm_dir'] = 'C:\\Program Files (x86)\\glm'
 if env['glm_includes'] == '' and env['glm_dir'] != '':
-    print("setting includes")
     env['glm_includes'] = Dir(env['glm_dir'] + '/include')
 env.Append(CPPPATH = [env['glm_includes']])
 

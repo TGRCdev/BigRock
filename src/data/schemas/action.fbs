@@ -1,0 +1,10 @@
+namespace schemas;
+
+enum ActionType : byte {Emplace}
+
+table Action
+{
+    type:ActionType;
+}
+
+root_type Action;

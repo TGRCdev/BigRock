@@ -32,10 +32,22 @@ struct Tool
 
     virtual ToolType get_tool_type() const = 0;
 
+    /// Returns true if the tool is concave, false if convex.
+    /// If a tool is concave, cell MUST subdivide to the lowest
+    /// level to reveal ALL detail
+    virtual bool is_concave() const = 0;
+
+    /// Returns the maximum subdivision depth to get all detail
+    /// Returns -1 if max depth is not applicable, i.e. if the tool
+    /// is convex
+    virtual int get_max_depth() const = 0;
+
     /// Returns a UTF-8 string with the encoded object.
     /// Returns an empty string on error.
     std::string serialize() const;
 
+    /// Returns the Tool stored in the buffer
+    /// Returns nullptr if the buffer is invalid
     static std::unique_ptr<Tool> deserialize(const void *buf, size_t length);
 };
 

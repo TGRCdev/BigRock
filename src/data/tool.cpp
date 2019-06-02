@@ -5,6 +5,14 @@
 // Tools
 #include "tools/ellipsoid.hpp"
 
+#if BR_USE_DOUBLE_PRECISION
+#define TransformType schemas::Transformd
+#define TransformTag schemas::Transform_Transformd
+#else
+#define TransformType schemas::Transformf
+#define TransformTag schemas::Transform_Transformf
+#endif
+
 namespace bigrock {
 namespace data {
 
@@ -33,8 +41,8 @@ std::string Tool::serialize() const
         return std::string();
     }
     flatbuffers::FlatBufferBuilder builder;
-    schemas::Transformf trns = transform;
-    auto tool = schemas::CreateTool(builder, &trns, ttype);
+    auto trns = builder.CreateStruct<TransformType>(this->transform);
+    auto tool = schemas::CreateTool(builder, TransformTag, trns.Union(), ttype);
     builder.Finish(tool);
     return std::string(reinterpret_cast<char*>(builder.GetBufferPointer()), static_cast<size_t>(builder.GetSize()));
 }
@@ -60,7 +68,16 @@ std::unique_ptr<Tool> Tool::deserialize(const void *buf, size_t length)
     if(!newtool)
         return nullptr;
     
-    newtool->transform = tool->transform();
+    auto trnstype = tool->transform_type();
+    switch(trnstype)
+    {
+        case schemas::Transform_Transformd:
+        newtool->transform = tool->transform_as_Transformd();
+        break;
+        case schemas::Transform_Transformf:
+        newtool->transform = tool->transform_as_Transformf();
+        break;
+    }
     return std::unique_ptr<Tool>(newtool);
 }
 

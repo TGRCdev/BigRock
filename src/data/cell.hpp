@@ -50,24 +50,34 @@ class Cell
 
     bool has_children() const {return children != NULL;}
 
+    bool owns_corner(char index) const {return (owned_vertices & (1 << index)) != 0;}
+
     /// Splits the cell into 8 child cells. If the cell already has children, does nothing.
     void subdivide();
 
     /// Collapses the cell's children. If the cell is a leaf, does nothing.
     void undivide();
 
+    /// Attempts to collapse similar cells to save memory and increase performance
+    void optimize();
+
     /// Interpolates the corners using the global point given
-    Point sample(Vector3 point) const;
+    Point sample(Vector3 point, bool recursive = true) const;
     /// Interpolates the corners using the local point with values [0-1] given
     Point sample_local(Vector3 point) const;
 
-    ToolQueryResult apply(const Tool &t, const Action &a);
+    ToolQueryResult apply(const Tool &t, const Action &a, const int max_depth = -1);
 
     const Point &get_corner(int index) const {return *corners[index % 8];}
+    Point &get_corner(int index) {return *corners[index % 8];}
     Vector3 get_corner_pos(int index) const {return position + (GRID_VERTICES[index] / br_real_t(1ULL << subdiv_level));}
+
+    int get_index_containing_pos(const Vector3 pos) const;
 
     unsigned char get_depth() {return subdiv_level;}
     Cell *get_child(int index) {return (has_children() ? &children[index] : NULL);}
+
+    AABB get_aabb() const;
 
     std::unique_ptr<std::string> serialize() const;
     static std::unique_ptr<Cell> deserialize(const void *buf, size_t length);

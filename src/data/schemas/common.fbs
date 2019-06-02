@@ -14,6 +14,12 @@ struct Vec3d
     z:double;
 }
 
+union Vec3
+{
+    Vec3f,
+    Vec3d
+}
+
 struct Vec4f
 {
     x:float;
@@ -30,6 +36,12 @@ struct Vec4d
     w:double;
 }
 
+union Vec4
+{
+    Vec4f,
+    Vec4d
+}
+
 struct Transformf
 {
     origin:Vec3f;
@@ -42,4 +54,10 @@ struct Transformd
     origin:Vec3d;
     rotation:Vec4d;
     scale:Vec3d;
+}
+
+union Transform
+{
+    Transformf,
+    Transformd
 }
