@@ -48,10 +48,12 @@ else:
     env = Environment(TARGET_ARCH = target_arch)
 
 opts.Update(env)
+
 if env['glm_dir'] == '':
     if platform.system() == 'Windows':
-        env['glm_dir'] == 'C:\\Program Files (x86)\\glm'
+        env['glm_dir'] = 'C:\\Program Files (x86)\\glm'
 if env['glm_includes'] == '' and env['glm_dir'] != '':
+    print("setting includes")
     env['glm_includes'] = Dir(env['glm_dir'] + '/include')
 env.Append(CPPPATH = [env['glm_includes']])
 

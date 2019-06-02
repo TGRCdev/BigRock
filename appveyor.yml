@@ -1,0 +1,31 @@
+image: Visual Studio 2015
+
+cache:
+  - '%APPVEYOR_BUILD_FOLDER%/CMake'
+  - '%APPVEYOR_BUILD_FOLDER%/glm'
+  - '%APPVEYOR_BUILD_FOLDER%/flatbuffers'
+
+install: 
+- python -m pip install scons
+- git clone https://github.com/g-truc/glm & exit 0
+- git clone https://github.com/google/flatbuffers & exit 0
+- mkdir CMake & exit 0
+- cd CMake
+- mkdir glm & exit 0
+- mkdir flatbuffers & exit 0
+- cd glm
+- cmake -D GLM_TEST_ENABLE:BOOL=0 %APPVEYOR_BUILD_FOLDER%/glm
+- msbuild INSTALL.vcxproj
+- cd ..
+- cd flatbuffers
+- cmake -D FLATBUFFERS_BUILD_TESTS:BOOL=0 %APPVEYOR_BUILD_FOLDER%/flatbuffers
+- msbuild INSTALL.vcxproj
+- cd %APPVEYOR_BUILD_FOLDER%
+
+environment:
+ matrix:
+  - DOUBLES: no
+  - DOUBLES: yes
+
+build_script:
+  scons -j2 bits=64 build_type=test use_doubles=%DOUBLES%
