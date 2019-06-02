@@ -113,10 +113,10 @@ Cell::~Cell()
         undivide();
     
     for(int i = 0; i < 8; i++)
-        if(owned_vertices & (1 << i) != 0)
+        if((owned_vertices & (1 << i)) != 0)
             delete corners[i];
 
-    if(subdiv_level == ~(0))
+    if(subdiv_level == (unsigned char)(0xFF))
         delete cell_count;
 }
 
@@ -161,7 +161,7 @@ void Cell::subdivide()
         new (children + i) (Cell) (false); // Placement new
         children[i].subdiv_level = this->subdiv_level + 1;
         children[i].cell_count = this->cell_count;
-        children[i].position = this->position + (GRID_VERTICES[i] / br_real_t(1ULL << subdiv_level + 1));
+        children[i].position = this->position + (GRID_VERTICES[i] / br_real_t(1ULL << (subdiv_level + 1)));
         glm::vec<3, int> cpos = GRID_VERTICES[i];
         bool badpos = glm::any(glm::greaterThanEqual(children[i].position, Vector3(1.0f)));// DEBUG
 
