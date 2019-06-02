@@ -36,7 +36,13 @@ install:
       python -m pip install scons --user;
     fi
   - git clone https://github.com/g-truc/glm || true
+  - cd glm
+  - git pull
+  - cd ..
   - git clone https://github.com/google/flatbuffers || true
+  - cd flatbuffers
+  - git pull
+  - cd ..
   - mkdir CMake || true
   - cd CMake
   - mkdir glm || true
@@ -62,8 +68,4 @@ script:
   scons -j2 build_type=test use_doubles=$DOUBLES
 
 after_script:
-  - $TRAVIS_BUILD_DIR/test/bin/tool_serialize_test # serialize
-  - $TRAVIS_BUILD_DIR/test/bin/tool_serialize_test # serialize & deserialize
-  - $TRAVIS_BUILD_DIR/test/bin/cell_serialize_test # serialize
-  - $TRAVIS_BUILD_DIR/test/bin/cell_serialize_test # serialize & deserialize
-  - $TRAVIS_BUILD_DIR/test/bin/ellipsoid_test # value test
+  - sh "$TRAVIS_BUILD_DIR/test/bin/run_tests.sh"
