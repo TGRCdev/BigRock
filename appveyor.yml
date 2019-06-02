@@ -6,6 +6,7 @@ cache:
   - '%APPVEYOR_BUILD_FOLDER%/flatbuffers'
 
 install: 
+- python -m pip install pywin32
 - python -m pip install scons
 - git clone https://github.com/g-truc/glm & exit 0
 - git clone https://github.com/google/flatbuffers & exit 0
@@ -28,4 +29,11 @@ environment:
   - DOUBLES: yes
 
 build_script:
-  scons -j2 bits=64 build_type=test use_doubles=%DOUBLES%
+  scons -j2 build_type=test use_doubles=%DOUBLES%
+
+after_build:
+  - "%APPVEYOR_BUILD_FOLDER%/test/bin/tool_serialize_test" # serialize
+  - "%APPVEYOR_BUILD_FOLDER%/test/bin/tool_serialize_test" # serialize & deserialize
+  - "%APPVEYOR_BUILD_FOLDER%/test/bin/cell_serialize_test" # serialize
+  - "%APPVEYOR_BUILD_FOLDER%/test/bin/cell_serialize_test" # serialize & deserialize
+  - "%APPVEYOR_BUILD_FOLDER%/test/bin/ellipsoid_test" # value test

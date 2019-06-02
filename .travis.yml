@@ -59,4 +59,11 @@ install:
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  scons -j2 bits=64 build_type=test use_doubles=$DOUBLES
+  scons -j2 build_type=test use_doubles=$DOUBLES
+
+after_script:
+  - $TRAVIS_BUILD_DIR/test/bin/tool_serialize_test # serialize
+  - $TRAVIS_BUILD_DIR/test/bin/tool_serialize_test # serialize & deserialize
+  - $TRAVIS_BUILD_DIR/test/bin/cell_serialize_test # serialize
+  - $TRAVIS_BUILD_DIR/test/bin/cell_serialize_test # serialize & deserialize
+  - $TRAVIS_BUILD_DIR/test/bin/ellipsoid_test # value test
