@@ -247,11 +247,8 @@ AABB Cell::get_aabb() const
 
 ToolQueryResult Cell::apply(const Tool &t, const Action &a, const int max_depth) // TODO: Tool application thread?
 {
-    for(int i = 0; i < 8; i++)
-        if(owns_corner(i))
-            a.update(t, get_corner_pos(i), get_corner(i));
-    
     if(!has_children() && (max_depth == -1 || subdiv_level < max_depth))
+    {
         if(t.is_concave())
         {
             if(t.get_max_depth() == -1 || t.get_max_depth() > subdiv_level)
@@ -262,6 +259,11 @@ ToolQueryResult Cell::apply(const Tool &t, const Action &a, const int max_depth)
             if(t.get_aabb().intersect(this->get_aabb()) == AABB::INTERSECT) // Only need surface detail for convex shapes
                 subdivide();
         }
+    }
+    
+    for(int i = 0; i < 8; i++)
+        if(owns_corner(i))
+            a.update(t, get_corner_pos(i), get_corner(i));
     
     if(has_children() && (max_depth == -1 || subdiv_level < max_depth))
         for(int i = 0; i < 8; i++)

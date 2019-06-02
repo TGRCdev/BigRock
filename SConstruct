@@ -22,6 +22,7 @@ opts.Add(PathVariable('flatbuffers_libs', 'The location of the FlatBuffers binar
 opts.Add(PathVariable('flatc_path', 'The path to the FlatBuffers schema compiler.', '', PathVariable.PathAccept))
 opts.Add(BoolVariable('use_doubles', 'If \'yes\', uses double precision numbers for positions and isovalues.', False))
 opts.Add('max_cell_depth', 'The max depth that terrain cells are allowed to subdivide to.', 24, positive_validator)
+opts.Add(BoolVariable('fast_maths', 'Whether or not to use spooky floating point optimizations.', False))
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -48,6 +49,9 @@ else:
     env = Environment(TARGET_ARCH = target_arch)
 
 opts.Update(env)
+
+if(env['fast_maths']):
+    print("\nWARNING: You have enabled fast maths.\nThis option can provide insane speed boosts, but it also breaks IEEE compliance and ignores values like NaN and Inf.\nOnly use this if you are extremely careful with what values you pass to BigRock.\nThis can ruin your entire life.\n\nNo pressure, though. I'm sure you know what you're doing.\n")
 
 if env['glm_dir'] == '':
     if platform.system() == 'Windows':
@@ -92,6 +96,9 @@ if env['CC'] == 'cl':
         env.Append(LINKFLAGS = ['/MACHINE:X86'])
     else:
         env.Append(LINKFLAGS = ['/MACHINE:X64'])
+    
+    if env['fast_maths']:
+        env.Append(CCFLAGS = '/fp:fast')
 else:
     #env.Append(CCFLAGS = ['-ansi'])
     if env['target'] == 'debug':
@@ -101,6 +108,9 @@ else:
         env.Append(CCFLAGS = ['-m32'])
     else:
         env.Append(CCFLAGS = ['-m64'])
+
+    if env['fast_maths']:
+        env.Append(CCFLAGS = '-ffast-math')
     
     env.Append(CCFLAGS = '-std=c++11')
 

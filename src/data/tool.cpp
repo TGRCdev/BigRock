@@ -77,6 +77,8 @@ std::unique_ptr<Tool> Tool::deserialize(const void *buf, size_t length)
         case schemas::Transform_Transformf:
         newtool->transform = tool->transform_as_Transformf();
         break;
+        default:
+        break;
     }
     return std::unique_ptr<Tool>(newtool);
 }

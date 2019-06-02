@@ -10,12 +10,15 @@ cache:
     - $TRAVIS_BUILD_DIR/CMake
     - $TRAVIS_BUILD_DIR/glm
     - $TRAVIS_BUILD_DIR/flatbuffers
+    - $HOME/.cache/pip
 
 compiler: gcc
 
 env:
-  - DOUBLES=no
-  - DOUBLES=yes
+  - DOUBLES=no FAST_MATHS=no
+  - DOUBLES=yes FAST_MATHS=no
+  - DOUBLES=no FAST_MATHS=yes
+  - DOUBLES=yes FAST_MATHS=yes
 
 # Travis CI's Windows Environment times out, so we can't use it yet
 # matrix:
@@ -65,7 +68,7 @@ install:
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  scons -j2 build_type=test use_doubles=$DOUBLES
+  scons -j2 build_type=test use_doubles=$DOUBLES fast_maths=$FAST_MATHS
 
 after_script:
   - sh "$TRAVIS_BUILD_DIR/test/bin/run_tests.sh"

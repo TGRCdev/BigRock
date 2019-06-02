@@ -4,38 +4,101 @@ cache:
   - '%APPVEYOR_BUILD_FOLDER%/CMake'
   - '%APPVEYOR_BUILD_FOLDER%/glm'
   - '%APPVEYOR_BUILD_FOLDER%/flatbuffers'
+  - '%APPDATA%/pip/Cache'
 
-install: 
-- python -m pip install pywin32
-- python -m pip install scons
-- git clone https://github.com/g-truc/glm & exit 0
-- cd glm
-- git pull
-- cd ..
-- git clone https://github.com/google/flatbuffers & exit 0
-- cd flatbuffers
-- git pull
-- cd ..
-- mkdir CMake & exit 0
-- cd CMake
-- mkdir glm & exit 0
-- mkdir flatbuffers & exit 0
-- cd glm
-- cmake -D GLM_TEST_ENABLE:BOOL=0 %APPVEYOR_BUILD_FOLDER%/glm
-- msbuild INSTALL.vcxproj
-- cd ..
-- cd flatbuffers
-- cmake -D FLATBUFFERS_BUILD_TESTS:BOOL=0 %APPVEYOR_BUILD_FOLDER%/flatbuffers
-- msbuild INSTALL.vcxproj
-- cd %APPVEYOR_BUILD_FOLDER%
+install:
+   - ps: >-
+      python -m pip install pywin32
+
+      python -m pip install scons
+
+      if($env:USE_MINGW -eq "yes") { $env:PATH = "C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;$env:PATH" }
+
+      Invoke-Expression 'git clone https://github.com/g-truc/glm'
+
+      cd glm
+
+      git pull
+
+      cd ..
+
+      Invoke-Expression 'git clone https://github.com/google/flatbuffers'
+
+      cd flatbuffers
+
+      git pull
+
+      cd ..
+
+      Invoke-Expression 'mkdir CMake'
+
+      cd CMake
+
+      Invoke-Expression 'mkdir glm'
+
+      Invoke-Expression 'mkdir flatbuffers'
+
+      cd glm
+
+      if ($env:USE_MINGW -eq "yes") {
+
+        cmake -DGLM_TEST_ENABLE:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" $env:APPVEYOR_BUILD_FOLDER/glm;
+
+        mingw32-make install all; } else {
+
+        cmake -DGLM_TEST_ENABLE:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" $env:APPVEYOR_BUILD_FOLDER/glm;
+
+        msbuild INSTALL.vcxproj; }
+
+      cd ..
+
+      cd flatbuffers
+
+      if($env:USE_MINGW -eq "yes") {
+
+        cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
+
+        mingw32-make install all;
+
+      } else {
+
+        cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
+
+        msbuild INSTALL.vcxproj;
+
+      }
+
+      cd $env:APPVEYOR_BUILD_FOLDER
 
 environment:
- matrix:
-  - DOUBLES: no
-  - DOUBLES: yes
+  matrix:
+    - DOUBLES: no
+      FAST_MATHS: no
+      USE_MINGW: no
+    - DOUBLES: no
+      FAST_MATHS: no
+      USE_MINGW: yes
+    - DOUBLES: yes
+      FAST_MATHS: no
+      USE_MINGW: no
+    - DOUBLES: yes
+      FAST_MATHS: no
+      USE_MINGW: yes
+    - DOUBLES: no
+      FAST_MATHS: yes
+      USE_MINGW: no
+    - DOUBLES: no
+      FAST_MATHS: yes
+      USE_MINGW: yes
+    - DOUBLES: yes
+      FAST_MATHS: yes
+      USE_MINGW: no
+    - DOUBLES: yes
+      FAST_MATHS: yes
+      USE_MINGW: yes
 
 build_script:
-  scons -j2 build_type=test use_doubles=%DOUBLES%
+  scons -j2 build_type=test use_doubles=%DOUBLES% fast_maths=%FAST_MATHS% use_mingw=%USE_MINGW%
 
-after_build:
+test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_tests"
