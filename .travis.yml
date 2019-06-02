@@ -1,0 +1,57 @@
+language: cpp
+sudo: true
+
+os:
+  - linux
+  - osx
+
+cache:
+  directories:
+    - $TRAVIS_BUILD_DIR/glm
+    - $TRAVIS_BUILD_DIR/flatbuffers
+
+compiler: gcc
+
+env:
+  - DOUBLES=no
+  - DOUBLES=yes
+
+# Travis CI's Windows Environment times out, so we can't use it yet
+# matrix:
+#   include:
+#     - env: DOUBLES=no
+#       os: windows
+#       compiler: msvc
+#     - env: DOUBLES=yes
+#       os: windows
+#       compiler: msvc
+#       filter_secrets: false
+
+install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+      brew install scons;
+    else
+      python -m pip install scons --user;
+    fi
+  - python -m pip install scons --user
+  - git clone https://github.com/g-truc/glm
+  - cd glm
+  - cmake -D GLM_TEST_ENABLE:BOOL=0 .
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+      msbuild INSTALL.vcxproj;
+    else
+      sudo make install all;
+    fi
+  - cd ..
+  - git clone https://github.com/google/flatbuffers
+  - cd flatbuffers
+  - cmake -D FLATBUFFERS_BUILD_TESTS:BOOL=0 .
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+      msbuild INSTALL.vcxproj;
+    else
+      sudo make install all;
+    fi
+  - cd ..
+
+script:
+  scons -j2 bits=64 build_type=test use_doubles=$DOUBLES
