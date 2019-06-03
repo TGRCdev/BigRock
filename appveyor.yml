@@ -4,7 +4,7 @@ cache:
   - '%APPVEYOR_BUILD_FOLDER%/CMake'
   - '%APPVEYOR_BUILD_FOLDER%/glm'
   - '%APPVEYOR_BUILD_FOLDER%/flatbuffers'
-  - '%LOCALAPPDATA%\pip\Cache -> appveyor.yml'
+  - '%LOCALAPPDATA%\pip\Cache'
 
 install:
    - ps: >-
@@ -73,32 +73,16 @@ install:
 environment:
   matrix:
     - DOUBLES: no
-      FAST_MATHS: no
       USE_MINGW: no
     - DOUBLES: no
-      FAST_MATHS: no
       USE_MINGW: yes
     - DOUBLES: yes
-      FAST_MATHS: no
       USE_MINGW: no
     - DOUBLES: yes
-      FAST_MATHS: no
-      USE_MINGW: yes
-    - DOUBLES: no
-      FAST_MATHS: yes
-      USE_MINGW: no
-    - DOUBLES: no
-      FAST_MATHS: yes
-      USE_MINGW: yes
-    - DOUBLES: yes
-      FAST_MATHS: yes
-      USE_MINGW: no
-    - DOUBLES: yes
-      FAST_MATHS: yes
       USE_MINGW: yes
 
 build_script:
-  scons -j2 build_type=test target=release use_doubles=%DOUBLES% fast_maths=%FAST_MATHS% use_mingw=%USE_MINGW%
+  scons -j2 build_type=test target=release use_doubles=%DOUBLES% use_mingw=%USE_MINGW%
 
 test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_tests"
