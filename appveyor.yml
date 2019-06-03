@@ -98,7 +98,7 @@ environment:
       USE_MINGW: yes
 
 build_script:
-  scons -j2 build_type=test use_doubles=%DOUBLES% fast_maths=%FAST_MATHS% use_mingw=%USE_MINGW%
+  scons -j2 build_type=test target=release use_doubles=%DOUBLES% fast_maths=%FAST_MATHS% use_mingw=%USE_MINGW%
 
 test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_tests"

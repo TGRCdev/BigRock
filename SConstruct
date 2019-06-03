@@ -88,9 +88,14 @@ if env['use_doubles']:
 
 env['bits'] = bits
 
+if env['target'] == 'release':
+    env.Append(CPPDEFINES = "NDEBUG")
+
 if env['CC'] == 'cl':
     if env['target'] == 'debug':
         env.Append(CCFLAGS = ['/EHsc', '/DEBUG:FULL'], LINKFLAGS = ['/DEBUG:FULL'])
+    else:
+        env.Append(CCFLAGS = ['/O2'])
 
     if env['bits'] == '32':
         env.Append(LINKFLAGS = ['/MACHINE:X86'])
@@ -102,7 +107,9 @@ if env['CC'] == 'cl':
 else:
     #env.Append(CCFLAGS = ['-ansi'])
     if env['target'] == 'debug':
-        env.Append(CCFLAGS = ['-g'])
+        env.Append(CCFLAGS = ['-g', '-Og'])
+    else:
+        env.Append(CCFLAGS = ['-O2'])
     
     if env['bits'] == '32':
         env.Append(CCFLAGS = ['-m32'])

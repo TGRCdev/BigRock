@@ -69,7 +69,7 @@ install:
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  scons -j2 build_type=test use_doubles=$DOUBLES fast_maths=$FAST_MATHS
+  scons -j2 build_type=test target=release use_doubles=$DOUBLES fast_maths=$FAST_MATHS
 
 after_script:
   - sh "$TRAVIS_BUILD_DIR/test/bin/run_tests.sh"
