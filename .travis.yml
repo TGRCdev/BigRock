@@ -10,7 +10,8 @@ cache:
     - $TRAVIS_BUILD_DIR/CMake
     - $TRAVIS_BUILD_DIR/glm
     - $TRAVIS_BUILD_DIR/flatbuffers
-    - $HOME/.cache/pip
+    - ~/.cache/pip
+    - ~/Library/Caches/Homebrew
 
 compiler: gcc
 

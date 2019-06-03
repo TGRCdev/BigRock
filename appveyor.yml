@@ -4,7 +4,7 @@ cache:
   - '%APPVEYOR_BUILD_FOLDER%/CMake'
   - '%APPVEYOR_BUILD_FOLDER%/glm'
   - '%APPVEYOR_BUILD_FOLDER%/flatbuffers'
-  - '%APPDATA%/pip/Cache'
+  - '%LOCALAPPDATA%\pip\Cache -> appveyor.yml'
 
 install:
    - ps: >-
