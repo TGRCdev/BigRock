@@ -12,6 +12,7 @@ cache:
     - $TRAVIS_BUILD_DIR/flatbuffers
     - ~/.cache/pip
     - ~/Library/Caches/Homebrew
+    - $TRAVIS_BUILD_DIR/.scons_cache
 
 compiler: gcc
 
@@ -67,7 +68,7 @@ install:
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  scons -j2 build_type=test target=release use_doubles=$DOUBLES
+  scons -j2 build_type=test target=release use_doubles=$DOUBLES cache=$TRAVIS_BUILD_DIR/.scons_cache
 
 after_script:
   - sh "$TRAVIS_BUILD_DIR/test/bin/run_tests.sh"

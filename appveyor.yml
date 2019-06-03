@@ -5,6 +5,7 @@ cache:
   - '%APPVEYOR_BUILD_FOLDER%/glm'
   - '%APPVEYOR_BUILD_FOLDER%/flatbuffers'
   - '%LOCALAPPDATA%\pip\Cache'
+  - '%APPVEYOR_BUILD_FOLDER%/.scons_cache'
 
 install:
    - ps: >-
@@ -82,7 +83,7 @@ environment:
       USE_MINGW: yes
 
 build_script:
-  scons -j2 build_type=test target=release use_doubles=%DOUBLES% use_mingw=%USE_MINGW%
+  scons -j2 build_type=test target=release use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache=%APPVEYOR_BUILD_FOLDER%/.scons_cache
 
 test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_tests"

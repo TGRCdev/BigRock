@@ -1,4 +1,4 @@
-import platform
+import platform, os
 
 sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools"), Dir("src/data/actions")]
 licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/cpm-glm-aabb/LICENSE')], "flatbuffers":[File('thirdparty/flatbuffers/LICENSE.txt')], "bigrock":[File('LICENSE')]}
@@ -23,6 +23,7 @@ opts.Add(PathVariable('flatc_path', 'The path to the FlatBuffers schema compiler
 opts.Add(BoolVariable('use_doubles', 'If \'yes\', uses double precision numbers for positions and isovalues.', False))
 opts.Add('max_cell_depth', 'The max depth that terrain cells are allowed to subdivide to.', 24, positive_validator)
 opts.Add(BoolVariable('fast_maths', 'Whether or not to use spooky floating point optimizations.', False))
+opts.Add(PathVariable('cache', 'If defined, caches build files here. Mostly for Travis CI and AppVeyor.', '', PathVariable.PathAccept))
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -75,6 +76,10 @@ if env['flatc_path'] == '':
     else:
         env['flatc_path'] = 'flatc'
 env.Append(CPPPATH = [env['flatbuffers_includes']], LIBPATH = [env['flatbuffers_libs']], LIBS = 'flatbuffers')
+
+if env['cache'] != '':
+    Mkdir(env['cache'])
+    CacheDir(env['cache'])
 
 if env['use_doubles']:
     env.Append(CPPDEFINES = 'BR_USE_DOUBLE_PRECISION')
