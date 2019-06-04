@@ -70,7 +70,7 @@ install:
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  scons -j2 build_type=test target=$TARGET use_doubles=$DOUBLES cache=$TRAVIS_BUILD_DIR/.scons_cache
+  scons -j2 build_type=test target=$TARGET use_doubles=$DOUBLES cache=$TRAVIS_BUILD_DIR/.scons_cache multithreading=$MULTITHREAD
 
 after_script:
   - sh "$TRAVIS_BUILD_DIR/test/bin/run_tests.sh"

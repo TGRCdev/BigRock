@@ -107,7 +107,7 @@ environment:
       MULTITHREADING: yes
 
 build_script:
-  scons -j2 build_type=test target=%TARGET% use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache=%APPVEYOR_BUILD_FOLDER%/.scons_cache
+  scons -j2 build_type=test target=%TARGET% use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache=%APPVEYOR_BUILD_FOLDER%/.scons_cache multithreading=%MULTITHREADING%
 
 test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_tests"
