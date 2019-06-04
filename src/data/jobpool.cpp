@@ -12,6 +12,8 @@
 namespace bigrock {
 namespace data {
 
+// Thank you to paxos1977 on Stack Overflow
+// https://stackoverflow.com/a/150971
 int JobPool::get_number_of_cores()
 {
     int numCores;
@@ -19,24 +21,8 @@ int JobPool::get_number_of_cores()
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
     numCores = sysinfo.dwNumberOfProcessors;
-#elif defined(unix) || defined(__unix__) || defined(__unix) // People are saying that some compilers don't define any of these, god I hope not.
+#elif defined(unix) || defined(__unix__) || defined(__unix) || defined( __APPLE__ ) || defined( __BSD__ ) // People are saying that some compilers don't define any of these, god I hope not.
     numCores = sysconf(_SC_NPROCESSORS_ONLN);
-#elif defined( __APPLE__ ) || defined( __BSD__ )
-    int mib[4];
-    std::size_t len = sizeof(numCores);
-
-    /* set the mib for hw.ncpu */
-    mib[0] = CTL_HW;
-    mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
-
-    /* get the number of CPUs from the system */
-    sysctl(mib, 2, &numCores, &len, NULL, 0);
-
-    if (numCores < 1) 
-    {
-        mib[1] = HW_NCPU;
-        sysctl(mib, 2, &numCores, &len, NULL, 0);
-    }
 #else
     #pragma message "Couldn't find the target operating system, number of cores will always be one."
     return 1;
