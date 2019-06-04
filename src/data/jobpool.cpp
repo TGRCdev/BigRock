@@ -3,7 +3,7 @@
 #define THREAD_IMPLEMENTATION
 #include "thread.h"
 
-#if defined(unix) || defined(__unix__) || defined(__unix)
+#if defined(unix) || defined(__unix__) || defined(__unix) || defined( __APPLE__ ) || defined( __BSD__ )
 #include <unistd.h>
 #else
 #include <windows.h>
@@ -14,41 +14,37 @@ namespace data {
 
 int JobPool::get_number_of_cores()
 {
+    int numCores;
 #if defined( _WIN32 )
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
-    int nmCpu = sysinfo.dwNumberOfProcessors;
-    if(nmCpu <= 0)
-        return 1;
-    else
-        return nmCpu;
+    numCores = sysinfo.dwNumberOfProcessors;
 #elif defined(unix) || defined(__unix__) || defined(__unix) // People are saying that some compilers don't define any of these, god I hope not.
-    int nmCpu = sysconf(_SC_NPROCESSORS_ONLN);
-    return (nmCpu > 0 ? nmCpu : 1);
+    numCores = sysconf(_SC_NPROCESSORS_ONLN);
 #elif defined( __APPLE__ ) || defined( __BSD__ )
     int mib[4];
-    int numCPU;
-    std::size_t len = sizeof(numCPU);
+    std::size_t len = sizeof(numCores);
 
     /* set the mib for hw.ncpu */
     mib[0] = CTL_HW;
     mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
 
     /* get the number of CPUs from the system */
-    sysctl(mib, 2, &numCPU, &len, NULL, 0);
+    sysctl(mib, 2, &numCores, &len, NULL, 0);
 
-    if (numCPU < 1) 
+    if (numCores < 1) 
     {
         mib[1] = HW_NCPU;
-        sysctl(mib, 2, &numCPU, &len, NULL, 0);
-        if (numCPU < 1)
-            numCPU = 1;
+        sysctl(mib, 2, &numCores, &len, NULL, 0);
     }
-    return numCPU; // what the hell, unix
 #else
     #pragma message "Couldn't find the target operating system, number of cores will always be one."
     return 1;
 #endif
+    if(numCores < 3)
+        return 3;
+    else
+        return numCores;
 }
 
 JobPool::worker_t::worker_t()
