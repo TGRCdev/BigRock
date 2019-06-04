@@ -6,6 +6,7 @@
 #include "tool.hpp"
 #include "action.hpp"
 #include "query_structs.hpp"
+#include "jobpool.hpp"
 
 #include "../grid_vertices.hpp"
 

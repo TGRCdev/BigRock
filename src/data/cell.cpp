@@ -3,8 +3,6 @@
 #include "../grid_vertices.hpp"
 #include "../defines.hpp"
 
-#include "jobpool.hpp"
-
 namespace bigrock {
 namespace data {
 
