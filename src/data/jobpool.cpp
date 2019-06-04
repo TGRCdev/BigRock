@@ -157,6 +157,8 @@ JobPool::~JobPool()
 
     thread_atomic_int_store(&ending, 1);
     thread_signal_raise(&boss_signal); // Boss will see ending is set to true and terminate
+    thread_join(boss);
+    thread_destroy(boss);
 
     delete[] workers;
 

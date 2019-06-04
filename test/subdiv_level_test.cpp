@@ -85,7 +85,7 @@ int main()
         else
             printf("%-11s|", " ");
         printf("\n%s+\n", string(42,'-').c_str());
-
         subdiv_level++;
     }
+    cout << "Subdivision level test complete." << endl;
 }
