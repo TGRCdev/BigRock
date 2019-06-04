@@ -112,7 +112,7 @@ if env['CC'] == 'cl':
 else:
     #env.Append(CCFLAGS = ['-ansi'])
     if env['target'] == 'debug':
-        env.Append(CCFLAGS = ['-g', '-Og'])
+        env.Append(CCFLAGS = ['-g'])
     else:
         env.Append(CCFLAGS = ['-O2'])
     
