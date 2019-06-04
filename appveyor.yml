@@ -75,15 +75,31 @@ environment:
   matrix:
     - DOUBLES: no
       USE_MINGW: no
+      TARGET: debug
     - DOUBLES: no
       USE_MINGW: yes
+      TARGET: debug
     - DOUBLES: yes
       USE_MINGW: no
+      TARGET: debug
     - DOUBLES: yes
       USE_MINGW: yes
+      TARGET: debug
+    - DOUBLES: no
+      USE_MINGW: no
+      TARGET: release
+    - DOUBLES: no
+      USE_MINGW: yes
+      TARGET: release
+    - DOUBLES: yes
+      USE_MINGW: no
+      TARGET: release
+    - DOUBLES: yes
+      USE_MINGW: yes
+      TARGET: release
 
 build_script:
-  scons -j2 build_type=test target=release use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache=%APPVEYOR_BUILD_FOLDER%/.scons_cache
+  scons -j2 build_type=test target=%TARGET% use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache=%APPVEYOR_BUILD_FOLDER%/.scons_cache
 
 test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_tests"

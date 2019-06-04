@@ -17,8 +17,10 @@ cache:
 compiler: gcc
 
 env:
-  - DOUBLES=no
-  - DOUBLES=yes
+  - DOUBLES=no TARGET=debug
+  - DOUBLES=yes TARGET=debug
+  - DOUBLES=no TARGET=release
+  - DOUBLES=yes TARGET=release
 
 # Travis CI's Windows Environment times out, so we can't use it yet
 # matrix:
@@ -68,7 +70,7 @@ install:
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  scons -j2 build_type=test target=release use_doubles=$DOUBLES cache=$TRAVIS_BUILD_DIR/.scons_cache
+  scons -j2 build_type=test target=$TARGET use_doubles=$DOUBLES cache=$TRAVIS_BUILD_DIR/.scons_cache
 
 after_script:
   - sh "$TRAVIS_BUILD_DIR/test/bin/run_tests.sh"
