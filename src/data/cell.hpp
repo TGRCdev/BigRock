@@ -36,6 +36,7 @@ class Cell
     
     static int cell_apply_thread(void *userdata);
     void apply_threaded(const Tool &t, const Action &a, const int max_depth);
+    void apply_unthreaded(const Tool &t, const Action &a, const int max_depth);
 
     template<class T>
     void load(const T &cell, PointMap &points);

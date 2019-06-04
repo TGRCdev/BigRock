@@ -27,8 +27,8 @@ int JobPool::get_number_of_cores()
     #pragma message "Couldn't find the target operating system, number of cores will always be one."
     return 1;
 #endif
-    if(numCores < 3)
-        return 3;
+    if(numCores < 1)
+        return 1;
     else
         return numCores;
 }

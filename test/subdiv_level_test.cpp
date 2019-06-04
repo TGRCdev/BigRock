@@ -2,6 +2,7 @@
 #include "../src/data/tools/ellipsoid.hpp"
 #include "../src/data/actions/emplace.hpp"
 #include "../src/defines.hpp"
+#include "../src/data/jobpool.hpp"
 
 #include <time.h>
 #include <iostream>
@@ -16,6 +17,7 @@ int main()
 {
     Cell cell;
     cout << "Tool Application Timing Test" << endl;
+    cout << "Number of cores: " << JobPool::get_number_of_cores() << endl;
     Ellipsoid whole; // A tool taking up space in the entire cell
     whole.transform = Vector3(0.5f);
     Ellipsoid corner; // A tool only taking up the corner of the cell

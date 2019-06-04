@@ -33,8 +33,8 @@ Point Point::interpolate(const Point &other, const float &t) const
             ret.material = this->material;
         else
         {
-            float begin = abs(this->isovalue);
-            float end = -abs(other.isovalue);
+            float begin = glm::abs(this->isovalue);
+            float end = -glm::abs(other.isovalue);
             float matval = glm::mix(begin, end, t);
             if(matval <= 0)
                 ret.material = other.material;
