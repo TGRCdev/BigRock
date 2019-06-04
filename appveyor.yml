@@ -76,27 +76,35 @@ environment:
     - DOUBLES: no
       USE_MINGW: no
       TARGET: debug
+      MULTITHREADING: no
     - DOUBLES: no
       USE_MINGW: yes
       TARGET: debug
+      MULTITHREADING: no
     - DOUBLES: yes
       USE_MINGW: no
       TARGET: debug
+      MULTITHREADING: no
     - DOUBLES: yes
       USE_MINGW: yes
       TARGET: debug
+      MULTITHREADING: no
     - DOUBLES: no
       USE_MINGW: no
       TARGET: release
+      MULTITHREADING: no
     - DOUBLES: no
       USE_MINGW: yes
       TARGET: release
-    - DOUBLES: yes
+      MULTITHREADING: no
+    - DOUBLES: no
       USE_MINGW: no
       TARGET: release
-    - DOUBLES: yes
+      MULTITHREADING: yes
+    - DOUBLES: no
       USE_MINGW: yes
       TARGET: release
+      MULTITHREADING: yes
 
 build_script:
   scons -j2 build_type=test target=%TARGET% use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache=%APPVEYOR_BUILD_FOLDER%/.scons_cache

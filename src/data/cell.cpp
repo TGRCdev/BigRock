@@ -253,6 +253,8 @@ struct cell_apply_data
     int max_depth;
 };
 
+#if !BR_DISABLE_MULTITHREADING
+
 int Cell::cell_apply_thread(void *userdata)
 { // userdata is the Cell
     if(!userdata)
@@ -267,10 +269,13 @@ int Cell::cell_apply_thread(void *userdata)
     return 1;
 }
 
+
 JobPool pool = JobPool();
+#endif
 
 void Cell::apply(const Tool &t, const Action &a, const int max_depth, bool multithread)
 {
+    #if !BR_DISABLE_MULTITHREADING
     if(multithread)
     {
         cell_apply_data *root_data = new cell_apply_data();
@@ -285,7 +290,12 @@ void Cell::apply(const Tool &t, const Action &a, const int max_depth, bool multi
     {
         this->apply_unthreaded(t, a, max_depth);
     }
+    #else
+    this->apply_unthreaded(t, a, max_depth);
+    #endif
 }
+
+#if !BR_DISABLE_MULTITHREADING
 
 // More effective on 3 or more core machines
 void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
@@ -329,6 +339,8 @@ void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
         pool.add_jobs(jobs, job_count);
     }
 }
+
+#endif
 
 // More effective on 1-2 core machines
 void Cell::apply_unthreaded(const Tool &t, const Action &a, const int max_depth)

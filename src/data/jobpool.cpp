@@ -33,6 +33,8 @@ int JobPool::get_number_of_cores()
         return numCores;
 }
 
+#if !BR_DISABLE_MULTITHREADING
+
 JobPool::worker_t::worker_t()
 {
     thread_atomic_int_store(&working, 0);
@@ -251,5 +253,7 @@ int JobPool::boss_thread(void *userdata)
     }
     return 0;
 }
+
+#endif
 
 }}

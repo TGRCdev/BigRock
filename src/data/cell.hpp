@@ -35,8 +35,11 @@ class Cell
 
     typedef std::map<const schemas::Point*, Point*> PointMap;
     
+    #if !BR_DISABLE_MULTITHREADING
     static int cell_apply_thread(void *userdata);
     void apply_threaded(const Tool &t, const Action &a, const int max_depth);
+    #endif
+
     void apply_unthreaded(const Tool &t, const Action &a, const int max_depth);
 
     template<class T>

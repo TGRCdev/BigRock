@@ -24,6 +24,7 @@ opts.Add(BoolVariable('use_doubles', 'If \'yes\', uses double precision numbers 
 opts.Add('max_cell_depth', 'The max depth that terrain cells are allowed to subdivide to.', 24, positive_validator)
 opts.Add(BoolVariable('fast_maths', 'Whether or not to use spooky floating point optimizations.', False))
 opts.Add(PathVariable('cache', 'If defined, caches build files here. Mostly for Travis CI and AppVeyor.', '', PathVariable.PathAccept))
+opts.Add(BoolVariable('multithreading', 'Whether or not to enable multithreading in certain areas of code.', True))
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -83,6 +84,8 @@ if env['cache'] != '':
 
 if env['use_doubles']:
     env.Append(CPPDEFINES = 'BR_USE_DOUBLE_PRECISION')
+if not env['multithreading']:
+    env.Append(CPPDEFINES = 'BR_DISABLE_MULTITHREADING')
 
 ## This only works half of the time and it's really god damn annoying
 # conf = Configure(env)

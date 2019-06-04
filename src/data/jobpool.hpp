@@ -2,7 +2,6 @@
 #define BIGROCK_JOBPOOL_H
 #pragma once
 
-#if !BR_DISABLE_MULTITHREADING
 #include <stack>
 
 #include "thread.h"
@@ -12,6 +11,7 @@ namespace data {
 
 class JobPool
 {
+    #if !BR_DISABLE_MULTITHREADING
 public:
     typedef int (*job_func_t)(void*);
 
@@ -70,14 +70,17 @@ private:
 
     static int boss_thread(void *userdata); // userdata is the JobPool the boss owns
 
+    #endif
 public:
+    /// Guaranteed to return at least 1
+    static int get_number_of_cores();
+
+    #if !BR_DISABLE_MULTITHREADING
+
     JobPool(const unsigned char thread_count = get_number_of_cores());
 
     // Waits for all current jobs to complete before destroying workers and boss.
     ~JobPool();
-
-    /// Guaranteed to return at least 1
-    static int get_number_of_cores();
 
     // Adds a job to the stack and notifies the boss thread
     void add_job(job_t job);
@@ -90,9 +93,9 @@ public:
     void wait_until_empty();
 
     friend class worker_t;
+    #endif
 };
 
 }}
 
-#endif // !BR_DISABLE_MULTITHREADING
 #endif // BIGROCK_JOBPOOL_H

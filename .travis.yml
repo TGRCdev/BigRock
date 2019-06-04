@@ -17,10 +17,10 @@ cache:
 compiler: gcc
 
 env:
-  - DOUBLES=no TARGET=debug
-  - DOUBLES=yes TARGET=debug
-  - DOUBLES=no TARGET=release
-  - DOUBLES=yes TARGET=release
+  - DOUBLES=no TARGET=debug MULTITHREAD=no
+  - DOUBLES=yes TARGET=debug MULTITHREAD=no
+  - DOUBLES=no TARGET=release MULTITHREAD=no
+  - DOUBLES=no TARGET=release MULTITHREAD=yes
 
 # Travis CI's Windows Environment times out, so we can't use it yet
 # matrix:
