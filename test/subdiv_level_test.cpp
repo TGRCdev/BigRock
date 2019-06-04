@@ -13,6 +13,12 @@ using namespace bigrock::data::tools;
 using namespace bigrock::data::actions;
 using namespace std;
 
+#if BR_DISABLE_MULTITHREADING
+#define USE_MULTI false
+#else
+#define USE_MULTI true
+#endif
+
 int main()
 {
     Cell cell;
@@ -36,7 +42,7 @@ int main()
         if(continue_whole)
         {
             whole_start = clock();
-            cell.apply(whole, e, subdiv_level);
+            cell.apply(whole, e, subdiv_level, USE_MULTI);
             whole_end = clock();
             if(float(whole_end - whole_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
                 continue_whole = false;
@@ -46,7 +52,7 @@ int main()
         if(continue_corner)
         {
             corner_start = clock();
-            cell.apply(corner, e, subdiv_level);
+            cell.apply(corner, e, subdiv_level, USE_MULTI);
             corner_end = clock();
             if(float(corner_end - corner_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
                 continue_corner = false;
@@ -56,7 +62,7 @@ int main()
         if(continue_small)
         {
             small_start = clock();
-            cell.apply(small, e, subdiv_level);
+            cell.apply(small, e, subdiv_level, USE_MULTI);
             small_end = clock();
             if(float(small_end - small_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
                 continue_small = false;

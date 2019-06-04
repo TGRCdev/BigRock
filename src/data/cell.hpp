@@ -74,7 +74,7 @@ class Cell
     /// Interpolates the corners using the local point with values [0-1] given
     Point sample_local(Vector3 point) const;
 
-    void apply(const Tool &t, const Action &a, const int max_depth = -1, bool multithreaded = (JobPool::get_number_of_cores() > 1));
+    void apply(const Tool &t, const Action &a, const int max_depth = -1, bool multithreaded = (JobPool::get_number_of_cores() > 1), unsigned char thread_count = std::max(JobPool::get_number_of_cores(), 2));
 
     const Point &get_corner(int index) const {return *corners[index % 8];}
     Point &get_corner(int index) {return *corners[index % 8];}

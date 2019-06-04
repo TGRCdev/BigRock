@@ -245,6 +245,8 @@ AABB Cell::get_aabb() const
     return ret;
 }
 
+#if !BR_DISABLE_MULTITHREADING
+
 struct cell_apply_data
 {
     Cell *c;
@@ -252,8 +254,6 @@ struct cell_apply_data
     const Action *a;
     int max_depth;
 };
-
-#if !BR_DISABLE_MULTITHREADING
 
 int Cell::cell_apply_thread(void *userdata)
 { // userdata is the Cell
@@ -269,29 +269,33 @@ int Cell::cell_apply_thread(void *userdata)
     return 1;
 }
 
-
-JobPool pool = JobPool();
+bool pool_ready = false;
+JobPool *pool = reinterpret_cast<JobPool*>(malloc(sizeof(JobPool)));
 #endif
-
-void Cell::apply(const Tool &t, const Action &a, const int max_depth, bool multithread)
+void Cell::apply(const Tool &t, const Action &a, const int max_depth, bool multithread, unsigned char thread_count)
 {
     #if !BR_DISABLE_MULTITHREADING
     if(multithread)
     {
+        if(pool_ready)
+            pool->~JobPool();
+        new (pool) (JobPool) (thread_count);
+        pool_ready = true;
+
         cell_apply_data *root_data = new cell_apply_data();
         root_data->t = &t;
         root_data->a = &a;
         root_data->c = this;
         root_data->max_depth = max_depth;
-        pool.add_job(&cell_apply_thread, root_data);
-        pool.wait_until_empty();
+        pool->add_job(&cell_apply_thread, root_data);
+        pool->wait_until_empty();
     }
     else
     {
         this->apply_unthreaded(t, a, max_depth);
     }
     #else
-    this->apply_unthreaded(t, a, max_depth);
+        this->apply_unthreaded(t, a, max_depth);
     #endif
 }
 
@@ -336,7 +340,7 @@ void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
                 job_count++;
             }
         }
-        pool.add_jobs(jobs, job_count);
+        pool->add_jobs(jobs, job_count);
     }
 }
 
