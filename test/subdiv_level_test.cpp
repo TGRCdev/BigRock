@@ -27,7 +27,7 @@ int main()
     printf("%s\n", string(52,'-').c_str());
 
     bool continue_whole = true, continue_corner = true, continue_small = true;
-    #define TIME_THRESHOLD 1 // How many seconds before testing stops
+    #define TIME_THRESHOLD 0.5 // How long subdivision should take before the test ends
     int subdiv_level = 1;
     while(subdiv_level < BR_MAX_CELL_DEPTH && (continue_whole || continue_corner || continue_small))
     {

@@ -3,6 +3,8 @@
 #include "../grid_vertices.hpp"
 #include "../defines.hpp"
 
+#include "jobpool.hpp"
+
 namespace bigrock {
 namespace data {
 
@@ -89,9 +91,9 @@ Cell::Cell(const schemas::CellRoot &cell)
     this->cell_count = new unsigned int(1);
     this->subdiv_level = 0;
     if(cell.root_type() == schemas::Cell_CellSingle)
-        this->load(*reinterpret_cast<const schemas::CellSingle*>(cell.root()), p);
+        this->load(*cell.root_as_CellSingle(), p);
     else if(cell.root_type() == schemas::Cell_CellDouble)
-        this->load(*reinterpret_cast<const schemas::CellDouble*>(cell.root()), p);
+        this->load(*cell.root_as_CellDouble(), p);
 }
 
 template <class T>
@@ -245,7 +247,42 @@ AABB Cell::get_aabb() const
     return ret;
 }
 
-ToolQueryResult Cell::apply(const Tool &t, const Action &a, const int max_depth) // TODO: Tool application thread?
+struct cell_apply_data
+{
+    Cell *c;
+    const Tool *t;
+    const Action *a;
+    int max_depth;
+};
+
+int Cell::cell_apply_thread(void *userdata)
+{ // userdata is the Cell
+    if(!userdata)
+        return 1;
+    
+    cell_apply_data *data = reinterpret_cast<cell_apply_data*>(userdata);
+    if(!data->c || !data->t || !data->a)
+        return 1;
+    
+    data->c->apply_threaded(*data->t, *data->a, data->max_depth);
+    delete data;
+    return 1;
+}
+
+JobPool pool = JobPool();
+
+void Cell::apply(const Tool &t, const Action &a, const int max_depth)
+{
+    cell_apply_data *root_data = new cell_apply_data();
+    root_data->t = &t;
+    root_data->a = &a;
+    root_data->c = this;
+    root_data->max_depth = max_depth;
+    pool.add_job(&cell_apply_thread, root_data);
+    pool.wait_until_empty();
+}
+
+void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
 {
     if(!has_children() && (max_depth == -1 || subdiv_level < max_depth))
     {
@@ -266,11 +303,25 @@ ToolQueryResult Cell::apply(const Tool &t, const Action &a, const int max_depth)
             a.update(t, get_corner_pos(i), get_corner(i));
     
     if(has_children() && (max_depth == -1 || subdiv_level < max_depth))
+    {
+        JobPool::job_t jobs[8];
+        int job_count = 0;
         for(int i = 0; i < 8; i++)
+        {
             if(children[i].get_aabb().intersect(t.get_aabb()) != AABB::OUTSIDE)
-                children[i].apply(t, a, max_depth);
-    
-    return ToolQueryResult(); // TODO
+            {
+                cell_apply_data *thread_data = new cell_apply_data();
+                thread_data->c = children + i;
+                thread_data->t = &t;
+                thread_data->a = &a;
+                thread_data->max_depth = max_depth;
+                jobs[job_count].func = &cell_apply_thread;
+                jobs[job_count].userdata = thread_data;
+                job_count++;
+            }
+        }
+        pool.add_jobs(jobs, job_count);
+    }
 }
 
 Offset<CellType> Cell::serialize(FlatBufferBuilder &builder, std::map<const Point*, Offset<schemas::Point> > &point_offsets) const

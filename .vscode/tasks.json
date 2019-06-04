@@ -6,9 +6,13 @@
       "type": "shell",
       "command": "scons",
       "args": [
-        "build_type=objects"
+        "build_type=objects",
+        "-j4"
       ],
-      "group": "build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
       "problemMatcher": [
         "$msCompile"
       ]
@@ -17,13 +21,11 @@
       "label": "Build Objects (MinGW)",
       "type": "shell",
       "command": "scons",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
+      "group": "build",
       "args": [
         "use_mingw=yes",
-        "build_type=objects"
+        "build_type=objects",
+        "-j4"
       ],
       "problemMatcher": [
         "$gcc"
@@ -36,7 +38,7 @@
       "args": [
         "build_type=schemas"
       ],
-      "group":"build",
+      "group": "build",
       "problemMatcher": []
     },
     {
@@ -45,7 +47,8 @@
       "command": "scons",
       "args": [
         "build_type=static",
-        "make_dir=yes"
+        "make_dir=yes",
+        "-j4"
       ],
       "group": "build",
       "problemMatcher": [
@@ -59,7 +62,8 @@
       "args": [
         "build_type=static",
         "make_dir=yes",
-        "use_mingw=yes"
+        "use_mingw=yes",
+        "-j4"
       ],
       "group": "build",
       "problemMatcher": [
@@ -71,7 +75,8 @@
       "type": "shell",
       "command": "scons",
       "args": [
-        "build_type=test"
+        "build_type=test",
+        "-j4"
       ],
       "group": "build",
       "problemMatcher": [
@@ -84,7 +89,8 @@
       "command": "scons",
       "args": [
         "build_type=test",
-        "use_mingw=yes"
+        "use_mingw=yes",
+        "-j4"
       ],
       "group": "build",
       "problemMatcher": [
@@ -97,7 +103,21 @@
       "command": "scons",
       "args": [
         "build_type=test",
-        "-c"
+        "-c",
+        "-j4"
+      ],
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean Test Program (MinGW)",
+      "type": "shell",
+      "command": "scons",
+      "args": [
+        "build_type=test",
+        "use_mingw=yes",
+        "-c",
+        "-j4"
       ],
       "group": "none",
       "problemMatcher": []
@@ -109,7 +129,8 @@
       "args": [
         "build_type=static",
         "make_dir=yes",
-        "-c"
+        "-c",
+        "-j4"
       ],
       "group": "build",
       "problemMatcher": []
@@ -122,7 +143,8 @@
         "build_type=static",
         "make_dir=yes",
         "use_mingw=yes",
-        "-c"
+        "-c",
+        "-j4"
       ],
       "group": "build",
       "problemMatcher": []

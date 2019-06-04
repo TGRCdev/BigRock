@@ -124,7 +124,7 @@ else:
     if env['fast_maths']:
         env.Append(CCFLAGS = '-ffast-math')
     
-    env.Append(CCFLAGS = '-std=c++11')
+    env.Append(CCFLAGS = '-std=c++11', LIBS=['pthread'])
 
 env.Append(CPPDEFINES = ['GLM_FORCE_CXX11', ('BR_MAX_CELL_DEPTH', env['max_cell_depth'])])
 
@@ -140,7 +140,7 @@ if env['target'] == 'debug':
 schemas = Glob("src/data/schemas/*.fbs")
 sch = []
 for schema in schemas:
-    sch += env.Command(str(schema)[:-4] + '_generated.h', schema, '"' + env['flatc_path'] + env['PROGSUFFIX'] + '" -o src/data/schemas -I src/data/schemas --cpp $SOURCE')
+    sch += env.Command(str(schema)[:-4] + '_generated.h', schema, '"' + env['flatc_path'] + '" -o src/data/schemas -I src/data/schemas --cpp $SOURCE')
 
 lib = None
 if env['build_type'] == 'static':

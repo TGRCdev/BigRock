@@ -33,6 +33,9 @@ class Cell
     > serialize(flatbuffers::FlatBufferBuilder &builder, std::map<const Point*, flatbuffers::Offset<schemas::Point> > &point_offsets) const;
 
     typedef std::map<const schemas::Point*, Point*> PointMap;
+    
+    static int cell_apply_thread(void *userdata);
+    void apply_threaded(const Tool &t, const Action &a, const int max_depth);
 
     template<class T>
     void load(const T &cell, PointMap &points);
@@ -66,7 +69,7 @@ class Cell
     /// Interpolates the corners using the local point with values [0-1] given
     Point sample_local(Vector3 point) const;
 
-    ToolQueryResult apply(const Tool &t, const Action &a, const int max_depth = -1);
+    void apply(const Tool &t, const Action &a, const int max_depth = -1);
 
     const Point &get_corner(int index) const {return *corners[index % 8];}
     Point &get_corner(int index) {return *corners[index % 8];}
