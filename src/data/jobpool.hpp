@@ -65,13 +65,13 @@ private:
 
     // Works on jobs, size is number of cores
     // When a worker's pointer is NULL, that worker is considered idle
-    const int worker_count;
+    const unsigned char worker_count;
     worker_t *workers;
 
     static int boss_thread(void *userdata); // userdata is the JobPool the boss owns
 
 public:
-    JobPool();
+    JobPool(const unsigned char thread_count = get_number_of_cores());
 
     // Waits for all current jobs to complete before destroying workers and boss.
     ~JobPool();

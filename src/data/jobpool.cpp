@@ -136,7 +136,7 @@ int JobPool::worker_t::worker_thread(void *userdata)
     return 0;
 }
 
-JobPool::JobPool() : worker_count(get_number_of_cores())
+JobPool::JobPool(const unsigned char thread_count) : worker_count(thread_count)
 {
     thread_atomic_int_store(&ending, 0);
     thread_atomic_int_store(&idle, 1);

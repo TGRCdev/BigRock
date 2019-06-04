@@ -271,9 +271,9 @@ int Cell::cell_apply_thread(void *userdata)
 
 JobPool pool = JobPool();
 
-void Cell::apply(const Tool &t, const Action &a, const int max_depth)
+void Cell::apply(const Tool &t, const Action &a, const int max_depth, bool multithread)
 {
-    if(JobPool::get_number_of_cores() > 2)
+    if(multithread)
     {
         cell_apply_data *root_data = new cell_apply_data();
         root_data->t = &t;
