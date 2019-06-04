@@ -24,25 +24,22 @@ int main()
     Ellipsoid small; // A tool only taking up a very small section of the corner of the cell
     small.transform.scale = Vector3(0.01f);
     Emplace e;
-    printf("Subdivide Level|Whole time |Corner time|Small time |\n");
-    printf("               |Whole size |Corner size|Small size |\n");
-    printf("%s\n", string(52,'-').c_str());
+    printf("Subdiv|Whole time |Corner time|Small time |\n");
+    printf("%s+\n", string(42,'-').c_str());
 
     bool continue_whole = true, continue_corner = true, continue_small = true;
-    #define TIME_THRESHOLD 0.5 // How long subdivision should take before the test ends
+    #define TIME_THRESHOLD 1.0 // How long subdivision should take before the test ends
     int subdiv_level = 1;
     while(subdiv_level < BR_MAX_CELL_DEPTH && (continue_whole || continue_corner || continue_small))
     {
         clock_t whole_start = 0, whole_end = 0, corner_start = 0, corner_end = 0, small_start = 0, small_end = 0;
-        size_t whole_size = 0, corner_size = 0, small_size = 0;
         if(continue_whole)
         {
             whole_start = clock();
             cell.apply(whole, e, subdiv_level);
             whole_end = clock();
-            if((whole_end - whole_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
+            if(float(whole_end - whole_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
                 continue_whole = false;
-            whole_size = cell.serialize()->length();
             cell.~Cell();
             new (&cell) (Cell) ();
         }
@@ -51,9 +48,8 @@ int main()
             corner_start = clock();
             cell.apply(corner, e, subdiv_level);
             corner_end = clock();
-            if((corner_end - corner_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
+            if(float(corner_end - corner_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
                 continue_corner = false;
-            corner_size = cell.serialize()->length();
             cell.~Cell();
             new (&cell) (Cell) ();
         }
@@ -62,13 +58,12 @@ int main()
             small_start = clock();
             cell.apply(small, e, subdiv_level);
             small_end = clock();
-            if((small_end - small_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
+            if(float(small_end - small_start) / CLOCKS_PER_SEC > TIME_THRESHOLD)
                 continue_small = false;
-            small_size = cell.serialize()->length();
             cell.~Cell();
             new (&cell) (Cell) ();
         }
-        printf("%-15d|", subdiv_level);
+        printf("%-6d|", subdiv_level);
         if(continue_whole || whole_end != 0)
             printf("%-11s|", (std::to_string(float(whole_end - whole_start) / CLOCKS_PER_SEC).substr(0, 8) + " s").c_str());
         else
@@ -83,66 +78,7 @@ int main()
             printf("%-11s|", (std::to_string(float(small_end - small_start) / CLOCKS_PER_SEC).substr(0,8) + " s").c_str());
         else
             printf("%-11s|", " ");
-        
-        printf("\n%-15s|", " ");
-
-        if(continue_whole || whole_end != 0)
-        {
-            char type = 0; // 0 = bytes, 1 = KB, 2 = MB
-            if(whole_size > 1e6)
-                type = 2;
-            else if(whole_size > 1000)
-                type = 1;
-            
-            printf("%-11s|",
-                type == 2 ? ("~" + to_string(float(whole_size) / 1e6 ).substr(0,7) + " MB").c_str() : 
-                type == 1 ? ("~" + to_string(float(whole_size) / 1000).substr(0,7) + " KB").c_str() : 
-                (to_string(whole_size) + " bytes").c_str()
-            );
-        }
-        else
-        {
-            printf("%-11s|", "");
-        }
-
-        if(continue_corner || corner_end != 0)
-        {
-            char type = 0; // 0 = bytes, 1 = KB, 2 = MB
-            if(corner_size > 1e6)
-                type = 2;
-            else if(corner_size > 1000)
-                type = 1;
-            
-            printf("%-11s|",
-                type == 2 ? ("~" + to_string(float(corner_size) / 1e6 ).substr(0,7) + " MB").c_str() : 
-                type == 1 ? ("~" + to_string(float(corner_size) / 1000).substr(0,7) + " KB").c_str() : 
-                (to_string(corner_size) + " bytes").c_str()
-            );
-        }
-        else
-        {
-            printf("%-11s|", "");
-        }
-
-        if(continue_small || small_end != 0)
-        {
-            char type = 0; // 0 = bytes, 1 = KB, 2 = MB
-            if(small_size > 1e6)
-                type = 2;
-            else if(small_size > 1000)
-                type = 1;
-            
-            printf("%-11s|",
-                type == 2 ? ("~" + to_string(float(small_size) / 1e6 ).substr(0,7) + " MB").c_str() : 
-                type == 1 ? ("~" + to_string(float(small_size) / 1000).substr(0,7) + " KB").c_str() : 
-                (to_string(whole_size) + " bytes").c_str()
-            );
-        }
-        else
-        {
-            printf("%-11s|", "");
-        }
-        printf("\n%s+\n", string(51,'-').c_str());
+        printf("\n%s+\n", string(42,'-').c_str());
 
         subdiv_level++;
     }
