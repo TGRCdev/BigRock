@@ -5,7 +5,7 @@
 
 #if defined(unix) || defined(__unix__) || defined(__unix) || defined( __APPLE__ ) || defined( __BSD__ )
 #include <unistd.h>
-#else
+#elif defined( _WIN32 )
 #include <windows.h>
 #endif
 
@@ -192,6 +192,24 @@ void JobPool::add_jobs(job_t* jobarr, int num_jobs)
     thread_mutex_lock(&jobs_mutex);
     for(int i = 0; i < num_jobs; i++)
         jobs.push(jobarr[i]);
+    thread_mutex_unlock(&jobs_mutex);
+
+    thread_signal_raise(&boss_signal);
+}
+
+template<class ConstIterator>
+void JobPool::add_jobs(ConstIterator &begin, ConstIterator &end)
+{
+    if(begin == end)
+        return;
+
+    thread_mutex_lock(&jobs_mutex);
+    ConstIterator it = begin;
+    while(it != end)
+    {
+        jobs.push(*it);
+        it++;
+    }
     thread_mutex_unlock(&jobs_mutex);
 
     thread_signal_raise(&boss_signal);

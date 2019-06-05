@@ -89,6 +89,9 @@ public:
     // Acquires the job stack's lock and adds all the jobs
     void add_jobs(job_t* jobs, int num_jobs);
 
+    template<class ConstIterator>
+    void add_jobs(ConstIterator &start, ConstIterator &end);
+
     // Blocks the calling thread until all jobs (including ones added by existing jobs) have been completed
     void wait_until_empty();
 

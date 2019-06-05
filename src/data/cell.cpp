@@ -194,6 +194,29 @@ void Cell::undivide()
     *cell_count -= 8;
 }
 
+bool Cell::optimize()
+{
+    if(is_leaf())
+        return can_collapse();
+    
+    bool can_optimize = true;
+    for(int i = 0; i < 8; i++)
+        can_optimize = children[i].optimize() && can_optimize;
+    
+    if(can_optimize)
+        undivide();
+    
+    return can_optimize && can_collapse();
+}
+
+bool Cell::can_collapse() const
+{
+    bool collapse = true;
+    for(int i = 0; collapse && i < 7; i++)
+        collapse = collapse && corners[i]->can_collapse(*corners[i+1]); // Collapsibility is transitive
+    return collapse;
+}
+
 int Cell::get_index_containing_pos(const Vector3 pos) const
 {
     Vector3 midpoint = glm::mix(get_corner_pos(0), get_corner_pos(7), 0.5);
@@ -340,7 +363,7 @@ void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
                 job_count++;
             }
         }
-        pool->add_jobs(jobs, job_count);
+        return pool->add_jobs(jobs, job_count);
     }
 }
 

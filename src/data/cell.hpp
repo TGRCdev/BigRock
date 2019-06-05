@@ -67,7 +67,13 @@ class Cell
     void undivide();
 
     /// Attempts to collapse similar cells to save memory and increase performance
-    void optimize();
+    /// Returns true if the cell is a leaf, or was successfully optimized
+    /// Returns false if the cell was not able to collapse its children
+    bool optimize();
+
+    /// Returns true if the corners are similar enough to be collapse with its siblings.
+    /// Returns false if the corners have distict geometry.
+    bool can_collapse() const;
 
     /// Interpolates the corners using the global point given
     Point sample(Vector3 point, bool recursive = true) const;
