@@ -15,7 +15,7 @@ install:
 
       if($env:USE_MINGW -eq "yes") { $env:PATH = "C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;$env:PATH" }
 
-      Invoke-Expression 'git clone https://github.com/g-truc/glm'
+      Invoke-Expression 'git clone https://github.com/g-truc/glm'-ErrorAction SilentlyContinue
 
       cd glm
 
@@ -23,7 +23,7 @@ install:
 
       cd ..
 
-      Invoke-Expression 'git clone https://github.com/google/flatbuffers'
+      Invoke-Expression 'git clone https://github.com/google/flatbuffers' -ErrorAction SilentlyContinue
 
       cd flatbuffers
 
@@ -31,13 +31,13 @@ install:
 
       cd ..
 
-      Invoke-Expression 'mkdir CMake'
+      Invoke-Expression 'mkdir CMake'-ErrorAction SilentlyContinue
 
       cd CMake
 
-      Invoke-Expression 'mkdir glm'
+      Invoke-Expression 'mkdir glm'-ErrorAction SilentlyContinue
 
-      Invoke-Expression 'mkdir flatbuffers'
+      Invoke-Expression 'mkdir flatbuffers'-ErrorAction SilentlyContinue
 
       cd glm
 
