@@ -25,6 +25,7 @@ opts.Add('max_cell_depth', 'The max depth that terrain cells are allowed to subd
 opts.Add(BoolVariable('fast_maths', 'Whether or not to use spooky floating point optimizations.', False))
 opts.Add(PathVariable('cache', 'If defined, caches build files here. Mostly for Travis CI and AppVeyor.', '', PathVariable.PathAccept))
 opts.Add(BoolVariable('multithreading', 'Whether or not to enable multithreading in certain areas of code.', True))
+opts.Add(BoolVariable('static_link_deps', 'When true, statically links all dependent libraries. Only for GCC/MinGW.', False))
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -128,6 +129,8 @@ else:
         env.Append(CCFLAGS = '-ffast-math')
     
     env.Append(CCFLAGS = '-std=c++11', LIBS=['pthread'])
+    if env['CC'] == 'gcc' and env['static_link_deps']:
+        env.Append(CCFLAGS = ['-static-libgcc', '-static-libstdc++', '-static'])
 
 env.Append(CPPDEFINES = ['GLM_FORCE_CXX11', ('BR_MAX_CELL_DEPTH', env['max_cell_depth'])])
 
