@@ -475,9 +475,9 @@ std::unique_ptr<Cell> Cell::deserialize(const void *buf, size_t length)
     return std::unique_ptr<Cell>(new Cell(*schemas::GetCellRoot(buf)));
 }
 
-char Cell::get_cube_index() const
+unsigned char Cell::get_cube_index() const
 {
-    char index = 0;
+    unsigned char index = 0;
     if(corners[0]->isovalue > 0) index |= 1;
     if(corners[1]->isovalue > 0) index |= 2;
     if(corners[2]->isovalue > 0) index |= 4;

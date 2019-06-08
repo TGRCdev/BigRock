@@ -93,7 +93,7 @@ class Cell
     const Cell *get_child(int index) const {return (has_children() ? &children[index] : NULL);}
 
     // Return a char bitfield representing which corners are inside of the terrain
-    char get_cube_index() const;
+    unsigned char get_cube_index() const;
 
     AABB get_aabb() const;
 

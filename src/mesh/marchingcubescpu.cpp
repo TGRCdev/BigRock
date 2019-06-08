@@ -373,13 +373,13 @@ struct edge_vertex
 
     edge_vertex(const glm::vec3 p1, const glm::vec3 p2, const Point &v1, const Point &v2)
     {
-        if(approx_equal(v2.isovalue, 0) || approx_equal(v1.isovalue, v2.isovalue))
+        if(approx_equal(v1.isovalue, 0) || approx_equal(v1.isovalue, v2.isovalue))
         {
             this->isovalue = v1.isovalue;
             this->material = v1.material;
             this->position = p1;
         }
-        else if(approx_equal(v1.isovalue, 0))
+        else if(approx_equal(v2.isovalue, 0))
         {
             this->isovalue = v2.isovalue;
             this->material = v2.material;
@@ -429,9 +429,9 @@ struct edge_vertex
 
 // Paul Bourke's algorithm and edge tables use a clockwise-ordered cube index.
 // My cube index is binary-ordered, so it needs to be converted.
-char get_clockwise_cube_index(const Cell &cell)
+unsigned char get_clockwise_cube_index(const Cell &cell)
 {
-    char index = 0;
+    unsigned char index = 0;
 
     if(cell.get_corner(4).isovalue > 0)
         index |= 1;
@@ -457,7 +457,7 @@ void MarchingCubesCPU::generate_unthreaded(const Cell &cell, const unsigned char
 {
     if(cell.is_leaf() || cell.get_depth() >= max_depth)
     {
-        char cubeindex = get_clockwise_cube_index(cell);
+        unsigned char cubeindex = get_clockwise_cube_index(cell);
 
         if(edgeTable[cubeindex] == 0)
             return;
