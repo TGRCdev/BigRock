@@ -82,14 +82,18 @@ class Cell
 
     void apply(const Tool &t, const Action &a, const int max_depth = -1, bool multithreaded = (JobPool::get_number_of_cores() > 1), unsigned char thread_count = std::max(JobPool::get_number_of_cores(), 2));
 
-    const Point &get_corner(int index) const {return *corners[index % 8];}
-    Point &get_corner(int index) {return *corners[index % 8];}
+    const Point &get_corner(int index) const {return *corners[index];}
+    Point &get_corner(int index) {return *corners[index];}
     Vector3 get_corner_pos(int index) const {return position + (GRID_VERTICES[index] / br_real_t(1ULL << subdiv_level));}
 
     int get_index_containing_pos(const Vector3 pos) const;
 
-    unsigned char get_depth() {return subdiv_level;}
+    unsigned char get_depth() const {return subdiv_level;}
     Cell *get_child(int index) {return (has_children() ? &children[index] : NULL);}
+    const Cell *get_child(int index) const {return (has_children() ? &children[index] : NULL);}
+
+    // Return a char bitfield representing which corners are inside of the terrain
+    char get_cube_index() const;
 
     AABB get_aabb() const;
 

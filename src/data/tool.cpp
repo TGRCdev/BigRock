@@ -25,7 +25,7 @@ AABB Tool::get_aabb() const
 {
     AABB ret;
     for(int i = 0; i < 8; i++)
-        ret.extend(GRID_VERTICES[i] - Vector3(0.5f));
+        ret.extend(transform.to_global(GRID_VERTICES[i] - Vector3(0.5f)));
     return ret;
 }
 

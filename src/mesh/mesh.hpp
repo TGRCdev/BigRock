@@ -13,18 +13,26 @@ namespace mesh {
 
 struct Vertex
 {
-    glm::vec3 point;
+    Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 tex_coords);
+    Vertex(glm::vec3 position, glm::vec3 normal);
+    Vertex(glm::vec3 position);
+    Vertex();
+
+    glm::vec3 position;
     glm::vec3 normal;
     glm::vec2 tex_coords;
 };
 
 struct Mesh
 {
-    Mesh();
-
     std::unique_ptr< std::vector<Vertex> > vertices;
-    unsigned char surface_count;
-    std::unique_ptr< std::vector< std::unique_ptr< std::vector<unsigned int> > > > surfaces; 
+    std::unique_ptr< std::vector< std::vector<unsigned int> > > surfaces;
+
+    #ifndef NDEBUG
+    // Only here for debug purposes
+    // Outputs the mesh in OBJ format
+    friend std::ostream &operator<<(std::ostream &os, const Mesh &mesh);
+    #endif
 };
 
 }}

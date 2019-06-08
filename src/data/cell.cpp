@@ -336,7 +336,7 @@ void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
         }
         else // convex
         {
-            if(t.get_aabb().intersect(this->get_aabb()) == AABB::INTERSECT) // Only need surface detail for convex shapes
+            if(t.get_aabb().intersect(this->get_aabb()) != AABB::OUTSIDE && !(t.value(get_corner_pos(0)) < 0 || t.value(get_corner_pos(7)) < 0)) // Only need surface detail for convex shapes
                 subdivide();
         }
     }
@@ -381,7 +381,7 @@ void Cell::apply_unthreaded(const Tool &t, const Action &a, const int max_depth)
         }
         else // convex
         {
-            if(t.get_aabb().intersect(this->get_aabb()) == AABB::INTERSECT) // Only need surface detail for convex shapes
+            if(t.get_aabb().intersect(this->get_aabb()) != AABB::OUTSIDE && (t.value(get_corner_pos(0)) < 0 || t.value(get_corner_pos(7)) < 0)) // Only need surface detail for convex shapes
                 subdivide();
         }
     }
@@ -395,7 +395,7 @@ void Cell::apply_unthreaded(const Tool &t, const Action &a, const int max_depth)
         for(int i = 0; i < 8; i++)
         {
             if(t.get_aabb().intersect(children[i].get_aabb()) != AABB::OUTSIDE)
-                children[i].apply(t, a, max_depth);
+                children[i].apply_unthreaded(t, a, max_depth);
         }
     }
 }
@@ -473,6 +473,20 @@ std::unique_ptr<Cell> Cell::deserialize(const void *buf, size_t length)
         return nullptr;
     
     return std::unique_ptr<Cell>(new Cell(*schemas::GetCellRoot(buf)));
+}
+
+char Cell::get_cube_index() const
+{
+    char index = 0;
+    if(corners[0]->isovalue > 0) index |= 1;
+    if(corners[1]->isovalue > 0) index |= 2;
+    if(corners[2]->isovalue > 0) index |= 4;
+    if(corners[3]->isovalue > 0) index |= 8;
+    if(corners[4]->isovalue > 0) index |= 16;
+    if(corners[5]->isovalue > 0) index |= 32;
+    if(corners[6]->isovalue > 0) index |= 64;
+    if(corners[7]->isovalue > 0) index |= 128;
+    return index;
 }
 
 }}

@@ -3,6 +3,8 @@
 #pragma once
 
 #include <limits>
+#include <glm/vec3.hpp>
+#include <functional>
 
 namespace bigrock
 {
@@ -16,5 +18,31 @@ namespace bigrock
         return (val1 - val2) < std::numeric_limits<float>::epsilon();
     }
 }
+
+template<>
+struct std::less<glm::vec3>
+{
+    bool operator() (const glm::vec3 &lh, const glm::vec3 &rh) const
+    {
+        if(lh.x < rh.x)
+            return true;
+        else if(lh.x > rh.x)
+            return false;
+        else
+        {
+            if(lh.y < rh.y)
+                return true;
+            else if(lh.y > rh.y)
+                return false;
+            else
+            {
+                if(lh.z < rh.z)
+                    return true;
+                else
+                    return false;
+            }
+        }
+    }
+};
 
 #endif
