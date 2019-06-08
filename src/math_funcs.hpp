@@ -19,30 +19,33 @@ namespace bigrock
     }
 }
 
-template<>
-struct std::less<glm::vec3>
+namespace std
 {
-    bool operator() (const glm::vec3 &lh, const glm::vec3 &rh) const
+    template<>
+    struct less<glm::vec3>
     {
-        if(lh.x < rh.x)
-            return true;
-        else if(lh.x > rh.x)
-            return false;
-        else
+        bool operator() (const glm::vec3 &lh, const glm::vec3 &rh) const
         {
-            if(lh.y < rh.y)
+            if(lh.x < rh.x)
                 return true;
-            else if(lh.y > rh.y)
+            else if(lh.x > rh.x)
                 return false;
             else
             {
-                if(lh.z < rh.z)
+                if(lh.y < rh.y)
                     return true;
-                else
+                else if(lh.y > rh.y)
                     return false;
+                else
+                {
+                    if(lh.z < rh.z)
+                        return true;
+                    else
+                        return false;
+                }
             }
         }
-    }
-};
+    };
+}
 
 #endif

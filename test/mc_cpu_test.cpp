@@ -66,10 +66,12 @@ int main()
     }
     cout << "Done." << endl;
     cout << "Terrain meshing took " << (end - start) << " clocks (about " << ((end - start) / CLOCKS_PER_SEC) << " seconds)" << endl;
+    #ifndef NDEBUG
     cout << "Outputting as OBJ file...";
     fstream out("terrain_mesh.obj", ios::out);
     out << *cellmesh;
     out.close();
     cout << "Done." << endl;
+    #endif
     return 0;
 }

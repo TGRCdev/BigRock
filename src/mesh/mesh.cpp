@@ -33,6 +33,8 @@ Vertex::Vertex()
     this->tex_coords = glm::vec2(0);
 }
 
+#ifndef NDEBUG
+
 std::ostream &operator<<(std::ostream &os, const Mesh &mesh)
 {
     for(auto v = mesh.vertices->begin(); v != mesh.vertices->end(); v++)
@@ -57,5 +59,7 @@ std::ostream &operator<<(std::ostream &os, const Mesh &mesh)
 
     return os;
 }
+
+#endif
 
 }}
