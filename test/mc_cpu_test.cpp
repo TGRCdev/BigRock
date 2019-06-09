@@ -36,13 +36,15 @@ void output_aabb_as_obj(std::ostream &out, const AABB &aabb)
 int main()
 {
     Ellipsoid t;
-    t.transform.origin = glm::vec3(0.5f);
-    t.transform.scale = glm::vec3(0.5f);
+    t.transform.origin = glm::vec3(0.4f, 0.25f, 0.25f);
+    t.transform.scale = glm::vec3(0.4f);
     Emplace a;
     cout << "Marching Cubes Test" << endl;
     Cell cell;
-    cout << "Applying Ellipsoid Tool at max_depth 6...";
-    cell.apply(t, a, 6, false);
+    cout << "Applying 2 Ellipsoid tools at max_depth 4...";
+    cell.apply(t, a, 4, false);
+    t.transform.origin.x = 0.6f;
+    cell.apply(t, a, 4, false);
     cout << "Done." << endl;
     cout << "Outputting cell AABB as OBJ file...";
     fstream c_aabb_out("cell_aabb.obj", ios::out);

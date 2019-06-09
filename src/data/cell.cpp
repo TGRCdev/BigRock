@@ -322,30 +322,54 @@ void Cell::apply(const Tool &t, const Action &a, const int max_depth, bool multi
     #endif
 }
 
+bool check_subdivide(Cell &cell, const Tool &t, const int max_depth)
+{
+    if(cell.has_children())
+        return true;
+    else
+    {
+        if(max_depth != -1 && cell.get_depth() >= max_depth)
+            return false;
+        
+        if(t.is_concave())
+        {
+            if(t.get_max_depth() == -1 || t.get_max_depth() > cell.get_depth())
+            {
+                cell.subdivide();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if(t.get_aabb().intersect(cell.get_aabb()) != AABB::OUTSIDE)// && (t.value(cell.get_corner_pos(0)) < 0.00001 || t.value(cell.get_corner_pos(7)) < 0.00001)) // Only need surface detail for convex shapes
+            {
+                cell.subdivide();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+}
+
 #if !BR_DISABLE_MULTITHREADING
 
 // More effective on 3 or more core machines
 void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
 {
-    if(!has_children() && (max_depth == -1 || subdiv_level < max_depth))
-    {
-        if(t.is_concave())
-        {
-            if(t.get_max_depth() == -1 || t.get_max_depth() > subdiv_level)
-                subdivide();
-        }
-        else // convex
-        {
-            if(t.get_aabb().intersect(this->get_aabb()) != AABB::OUTSIDE && !(t.value(get_corner_pos(0)) < 0 || t.value(get_corner_pos(7)) < 0)) // Only need surface detail for convex shapes
-                subdivide();
-        }
-    }
+    bool apply_children = check_subdivide(*this, t, max_depth);
     
     for(int i = 0; i < 8; i++)
         if(owns_corner(i))
             a.update(t, get_corner_pos(i), get_corner(i));
     
-    if(has_children() && (max_depth == -1 || subdiv_level < max_depth))
+    if(apply_children)
     {
         JobPool::job_t jobs[8];
         int job_count = 0;
@@ -372,25 +396,13 @@ void Cell::apply_threaded(const Tool &t, const Action &a, const int max_depth)
 // More effective on 1-2 core machines
 void Cell::apply_unthreaded(const Tool &t, const Action &a, const int max_depth)
 {
-    if(!has_children() && (max_depth == -1 || subdiv_level < max_depth))
-    {
-        if(t.is_concave())
-        {
-            if(t.get_max_depth() == -1 || t.get_max_depth() > subdiv_level)
-                subdivide();
-        }
-        else // convex
-        {
-            if(t.get_aabb().intersect(this->get_aabb()) != AABB::OUTSIDE && (t.value(get_corner_pos(0)) < 0 || t.value(get_corner_pos(7)) < 0)) // Only need surface detail for convex shapes
-                subdivide();
-        }
-    }
+    bool apply_children = check_subdivide(*this, t, max_depth);
     
     for(int i = 0; i < 8; i++)
         if(owns_corner(i))
             a.update(t, get_corner_pos(i), get_corner(i));
     
-    if(has_children() && (max_depth == -1 || subdiv_level < max_depth))
+    if(apply_children)
     {
         for(int i = 0; i < 8; i++)
         {

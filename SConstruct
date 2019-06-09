@@ -52,6 +52,10 @@ else:
     env = Environment(TARGET_ARCH = target_arch)
 
 opts.Update(env)
+unknown = opts.UnknownVariables()
+if unknown:
+    print("WARNING: Unknown variables - ", unknown.keys())
+    Exit(1)
 
 if(env['fast_maths']):
     print("\nWARNING: You have enabled fast maths.\nThis option can provide insane speed boosts, but it also breaks IEEE compliance and ignores values like NaN and Inf.\nOnly use this if you are extremely careful with what values you pass to BigRock.\nThis can ruin your entire life.\n\nNo pressure, though. I'm sure you know what you're doing.\n")
