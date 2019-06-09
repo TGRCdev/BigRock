@@ -15,7 +15,7 @@ namespace bigrock
 
     inline bool approx_equal(float val1, float val2)
     {
-        return (val1 - val2) < std::numeric_limits<float>::epsilon();
+        return std::abs(val1 - val2) < std::numeric_limits<float>::epsilon();
     }
 }
 
