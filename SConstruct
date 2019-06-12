@@ -1,4 +1,4 @@
-import platform, os
+import platform, os, sys
 
 sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools"), Dir("src/data/actions")]
 licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/cpm-glm-aabb/LICENSE')], "flatbuffers":[File('thirdparty/flatbuffers/LICENSE.txt')], "bigrock":[File('LICENSE')]}
@@ -29,19 +29,12 @@ opts.Add(BoolVariable('static_link_deps', 'When true, statically links all depen
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
-    host_arch = DefaultEnvironment()['HOST_ARCH']
-    if host_arch:
-        arches = {
-            'x86' : '32',
-            'x86_64' : '64',
-            'i386' : '32',
-            'amd64' : '64',
-            'emt64' : '64',
-            'ia64' : '64'
-        }
-        bits = arches[host_arch]
-    else:
+    is_64bit = sys.maxsize > 2**32
+    if is_64bit:
         bits = '64'
+    else:
+        bits = '32'
+    print("'bits' was not set, assuming host bits: " + bits)
 
 target_arch = 'x86_64' if bits == '64' else 'x86'
 
@@ -125,16 +118,16 @@ else:
         env.Append(CCFLAGS = ['-O2'])
     
     if env['bits'] == '32':
-        env.Append(CCFLAGS = ['-m32'])
+        env.Append(CCFLAGS = ['-m32'], LINKFLAGS = ['-m32'])
     else:
-        env.Append(CCFLAGS = ['-m64'])
+        env.Append(CCFLAGS = ['-m64'], LINKFLAGS = ['-m64'])
 
     if env['fast_maths']:
         env.Append(CCFLAGS = '-ffast-math')
     
-    env.Append(CCFLAGS = '-std=c++11', LIBS=['pthread'])
+    env.Append(CXXFLAGS = '-std=gnu++11', LIBS=['pthread'])
     if env['CC'] == 'gcc' and env['static_link_deps']:
-        env.Append(CCFLAGS = ['-static-libgcc', '-static-libstdc++', '-static'])
+        env.Append(CCFLAGS = ['-static-libgcc', '-static'], CXXFLAGS = ['-static-libstdc++'])
 
 env.Append(CPPDEFINES = ['GLM_FORCE_CXX11', ('BR_MAX_CELL_DEPTH', env['max_cell_depth'])])
 

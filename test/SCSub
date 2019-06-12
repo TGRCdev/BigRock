@@ -1,5 +1,5 @@
 Import('env', 'sources', 'opts')
-import platform
+import platform, sys
 
 thrd_inc = [Dir('thirdparty/glad/include')]
 thrd_src = [Dir('thirdparty/glad/src')]
@@ -19,10 +19,14 @@ if env['glfw_libs'] == '':
     env['glfw_libs'] = str(env['glfw_dir']) + '/lib'
 
 env.Append(CPPPATH = env['glfw_includes'], LIBPATH = env['glfw_libs'], LIBS=['glfw3'])
-if platform.system() == 'Windows':
+if sys.platform.startswith('win32'):
     env.Append(LIBS=['opengl32', 'Gdi32'])
     if env['CC'] == 'cl':
         env.Append(LIBS=['shell32', 'user32'], CCFLAGS=['/MD'])
+elif sys.platform.startswith('linux') or sys.platform.startswith('freebsd'):
+    env.Append(LIBS=['X11', 'dl'])
+elif sys.platform.startswith('darwin'):
+    env.Append(FRAMEWORKS=['CoreVideo', 'Cocoa', 'OpenGL', 'IOKit', 'Carbon'])
 
 # Build unit tests
 Export('env', 'sources')

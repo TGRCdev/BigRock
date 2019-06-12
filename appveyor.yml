@@ -14,7 +14,9 @@ install:
 
       python -m pip install scons
 
-      if($env:USE_MINGW -eq "yes") { $env:PATH = "C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;$env:PATH" }
+      if($env:USE_MINGW -eq "yes") { $env:PATH = "C:\MinGW\bin;$env:PATH" }
+
+      del (Get-Command sh.exe).path
 
       Invoke-Expression 'git clone https://github.com/g-truc/glm'-ErrorAction SilentlyContinue
 
@@ -52,9 +54,11 @@ install:
 
       cd glm
 
+      Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
+
       if ($env:USE_MINGW -eq "yes") {
 
-        cmake -DGLM_TEST_ENABLE:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" $env:APPVEYOR_BUILD_FOLDER/glm;
+        cmake -DGLM_TEST_ENABLE:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" -E env CFLAGS="-m32" -E env LINKER_FLAGS="-m32" $env:APPVEYOR_BUILD_FOLDER/glm;
 
         mingw32-make install all; } else {
 
@@ -66,9 +70,11 @@ install:
 
       cd flatbuffers
 
+      Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
+
       if($env:USE_MINGW -eq "yes") {
 
-        cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
+        cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" -E env CFLAGS="-m32" -E env LINKER_FLAGS="-m32" $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
 
         mingw32-make install all;
 
@@ -84,9 +90,11 @@ install:
 
       cd glfw
 
+      Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
+
       if($env:USE_MINGW -eq "yes") {
 
-        cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 -G "MinGW Makefiles" $env:APPVEYOR_BUILD_FOLDER/glfw;
+        cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 -G "MinGW Makefiles" -E env CFLAGS="-m32" -E env LINKER_FLAGS="-m32" $env:APPVEYOR_BUILD_FOLDER/glfw;
 
         mingw32-make install all;
 
