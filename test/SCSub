@@ -1,31 +1,41 @@
-Import('env', 'sources')
-testops = Variables()
-import platform, os, stat
+Import('env', 'sources', 'opts')
+import platform
 
-def build_test_shell(target, source, env):
-    path = target[0].abspath
-    print(path)
-    f = open(path, "w")
-    for prog in source:
-        f.write('"' + prog.abspath + '"')
-        f.write("\n")
-    f.close()
-    if(platform.system() != 'Windows'):
-        os.chmod(target[0].abspath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+thrd_inc = [Dir('thirdparty/glad/include')]
+thrd_src = [Dir('thirdparty/glad/src')]
 
-sources += Glob("shared/*.cpp")
+testopts = Variables()
+testopts.Add(PathVariable('glfw_dir', 'The path to a valid GLFW installation.', '', PathVariable.PathAccept))
+testopts.Add(PathVariable('glfw_includes', 'The path to a valid GLFW installation\'s headers', '', PathVariable.PathAccept))
+testopts.Add(PathVariable('glfw_libs', 'The path to a valid GLFW installation\'s binaries', '', PathVariable.PathAccept))
+testopts.Update(env)
 
-progsrc = Glob("*.cpp")
+if env['glfw_dir'] == '':
+    if platform.system() == 'Windows':
+        env['glfw_dir'] = Dir('C:/Program Files (x86)/GLFW')
+if env['glfw_includes'] == '':
+    env['glfw_includes'] = str(env['glfw_dir']) + '/include'
+if env['glfw_libs'] == '':
+    env['glfw_libs'] = str(env['glfw_dir']) + '/lib'
 
-proglist = []
-for prog in progsrc:
-    proglist += env.Program(target='bin/' + str(prog)[:-4], source=sources + [prog])
+env.Append(CPPPATH = env['glfw_includes'], LIBPATH = env['glfw_libs'], LIBS=['glfw3'])
+if platform.system() == 'Windows':
+    env.Append(LIBS=['opengl32', 'Gdi32'])
+    if env['CC'] == 'cl':
+        env.Append(LIBS=['shell32', 'user32'], CCFLAGS=['/MD'])
 
-suffix = ".sh"
-if(platform.system() == 'Windows'):
-    suffix = '.bat'
+# Build unit tests
+Export('env', 'sources')
+SConscript('unit_tests/SCSub')
 
-bld = Builder(action = build_test_shell, suffix = suffix, src_suffix = env['PROGSUFFIX'])
-env.Append(BUILDERS = {"TestShell": bld})
-env.TestShell("bin/run_tests", proglist)
+# Build test program
+env.Append(CPPPATH = thrd_inc)
 
+for path in thrd_src:
+    sources += Glob(str(path) + "/*.cpp")
+    sources += Glob(str(path) + "/*.c")
+sources += [File("test.cpp")]
+
+env.Program("bin/BigRock_Test", source=sources)
+
+Help(testopts.GenerateHelpText(env))

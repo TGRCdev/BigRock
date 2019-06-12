@@ -10,6 +10,7 @@ cache:
     - $TRAVIS_BUILD_DIR/CMake
     - $TRAVIS_BUILD_DIR/glm
     - $TRAVIS_BUILD_DIR/flatbuffers
+    - $TRAVIS_BUILD_DIR/glfw
     - ~/.cache/pip
     - ~/Library/Caches/Homebrew
     - $TRAVIS_BUILD_DIR/.scons_cache
@@ -48,10 +49,15 @@ install:
   - cd flatbuffers
   - git pull
   - cd ..
+  - git clone https://github.com/glfw/glfw || true
+  - cd glfw
+  - git pull
+  - cd ..
   - mkdir CMake || true
   - cd CMake
   - mkdir glm || true
   - mkdir flatbuffers || true
+  - mkdir glfw || true
   - cd glm
   - cmake -D GLM_TEST_ENABLE:BOOL=0 $TRAVIS_BUILD_DIR/glm
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
@@ -67,10 +73,18 @@ install:
     else
       sudo make install all;
     fi
+  - cd ..
+  - cd glfw
+  - cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 $TRAVIS_BUILD_DIR/glfw
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+      msbuild INSTALL.vcxproj;
+    else
+      sudo make install all;
+    fi
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  scons -j2 build_type=test target=$TARGET use_doubles=$DOUBLES cache=$TRAVIS_BUILD_DIR/.scons_cache multithreading=$MULTITHREAD
+  scons -j2 build_type=tests target=$TARGET use_doubles=$DOUBLES cache=$TRAVIS_BUILD_DIR/.scons_cache multithreading=$MULTITHREAD
 
 after_success:
-  - sh "$TRAVIS_BUILD_DIR/test/bin/run_tests.sh"
+  - sh "$TRAVIS_BUILD_DIR/test/bin/run_unit_tests.sh"

@@ -9,4 +9,8 @@ A work-in-progress 3D terrain library.
 - FlatBuffers
     - https://google.github.io/flatbuffers/
 
+# Additional Test Dependencies
+- GLFW
+    - https://www.glfw.org/
+
 ![Prototype Image](https://user-images.githubusercontent.com/4079184/57591767-de752f80-74e7-11e9-854d-72f5aeb6f3b6.jpg)

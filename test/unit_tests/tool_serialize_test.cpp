@@ -1,6 +1,6 @@
-#include "../src/data/tools/ellipsoid.hpp"
-#include "shared/common.h"
-#include "../src/defines.hpp"
+#include "../../src/data/tools/ellipsoid.hpp"
+#include "../shared/common.h"
+#include "../../src/defines.hpp"
 
 #include <iostream>
 #include <fstream>

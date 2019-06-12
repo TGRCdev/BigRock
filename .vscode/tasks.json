@@ -75,7 +75,7 @@
       "type": "shell",
       "command": "scons",
       "args": [
-        "build_type=test",
+        "build_type=tests",
         "-j4"
       ],
       "group": "build",
@@ -88,7 +88,7 @@
       "type": "shell",
       "command": "scons",
       "args": [
-        "build_type=test",
+        "build_type=tests",
         "use_mingw=yes",
         "-j4"
       ],
@@ -102,7 +102,7 @@
       "type": "shell",
       "command": "scons",
       "args": [
-        "build_type=test",
+        "build_type=tests",
         "-c",
         "-j4"
       ],
@@ -114,7 +114,7 @@
       "type": "shell",
       "command": "scons",
       "args": [
-        "build_type=test",
+        "build_type=tests",
         "use_mingw=yes",
         "-c",
         "-j4"

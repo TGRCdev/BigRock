@@ -12,7 +12,7 @@ opts = Variables()
 opts.Add(EnumVariable('target', 'The build target', 'debug', ['release', 'debug'], ignorecase=2))
 opts.Add(EnumVariable('bits', 'The target bits', '', ['32', '64', '']))
 opts.Add(BoolVariable('use_mingw', 'Set to \'yes\' to use MinGW on Windows machines.', False))
-opts.Add(EnumVariable('build_type', 'The type of build to perform.', 'objects', ['objects', 'schemas', 'static', 'shared', 'dynamic', 'test'], ignorecase=2))
+opts.Add(EnumVariable('build_type', 'The type of build to perform.', 'objects', ['objects', 'schemas', 'static', 'shared', 'dynamic', 'tests'], ignorecase=2))
 opts.Add(BoolVariable('make_dir', 'If \'yes\', constructs a library directory under \'lib/\' with the headers and the built library.', False))
 opts.Add(PathVariable('glm_dir', 'The location of the GLM library headers and binaries to link with.', '', PathVariable.PathAccept))
 opts.Add(PathVariable('glm_includes', 'The location of the headers for GLM to use.', '', PathVariable.PathAccept))
@@ -157,8 +157,8 @@ if env['build_type'] == 'static':
     lib = Requires(env.StaticLibrary(target = targetname, source = sources), sch)
 elif env['build_type'] == 'dynamic' or env['build_type'] == 'shared':
     lib = Requires(env.SharedLibrary(target = targetname, source = sources), sch)
-elif env['build_type'] == 'test':
-    Export('env', 'sources')
+elif env['build_type'] == 'tests':
+    Export('env', 'sources', 'opts')
     Requires(env.SConscript('test/SCSub'), sch)
 elif env['build_type'] == 'objects':
     Requires(env.Object(source=sources), sch)

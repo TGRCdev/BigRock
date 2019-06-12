@@ -1,0 +1,30 @@
+Import('env', 'sources')
+import platform, os, stat
+
+def build_test_shell(target, source, env):
+    path = target[0].abspath
+    print(path)
+    f = open(path, "w")
+    for prog in source:
+        f.write('"' + prog.abspath + '"')
+        f.write("\n")
+    f.close()
+    if(platform.system() != 'Windows'):
+        os.chmod(target[0].abspath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
+
+sources += Glob("../shared/*.cpp")
+
+progsrc = Glob("*.cpp")
+
+proglist = []
+for prog in progsrc:
+    proglist += env.Program(target='../bin/' + str(prog)[:-4], source=sources + [prog])
+
+suffix = ".sh"
+if(platform.system() == 'Windows'):
+    suffix = '.bat'
+
+bld = Builder(action = build_test_shell, suffix = suffix, src_suffix = env['PROGSUFFIX'])
+env.Append(BUILDERS = {"TestShell": bld})
+env.TestShell("../bin/run_unit_tests", proglist)
+

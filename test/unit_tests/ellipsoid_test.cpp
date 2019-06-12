@@ -1,5 +1,5 @@
-#include "../src/data/tools/ellipsoid.hpp"
-#include "shared/common.h"
+#include "../../src/data/tools/ellipsoid.hpp"
+#include "../shared/common.h"
 
 #include <glm/vec3.hpp>
 #include <iostream>

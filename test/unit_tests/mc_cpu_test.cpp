@@ -1,7 +1,7 @@
-#include "../src/data/cell.hpp"
-#include "../src/data/tools/ellipsoid.hpp"
-#include "../src/data/actions/emplace.hpp"
-#include "../src/mesh/marchingcubescpu.hpp"
+#include "../../src/data/cell.hpp"
+#include "../../src/data/tools/ellipsoid.hpp"
+#include "../../src/data/actions/emplace.hpp"
+#include "../../src/mesh/marchingcubescpu.hpp"
 
 #include <iostream>
 #include <fstream>

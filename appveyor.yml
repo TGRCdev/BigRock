@@ -4,6 +4,7 @@ cache:
   - '%APPVEYOR_BUILD_FOLDER%/CMake'
   - '%APPVEYOR_BUILD_FOLDER%/glm'
   - '%APPVEYOR_BUILD_FOLDER%/flatbuffers'
+  - '%APPVEYOR_BUILD_FOLDER%/glfw'
   - '%LOCALAPPDATA%\pip\Cache'
   - '%APPVEYOR_BUILD_FOLDER%/.scons_cache'
 
@@ -31,13 +32,23 @@ install:
 
       cd ..
 
-      Invoke-Expression 'mkdir CMake'-ErrorAction SilentlyContinue
+      Invoke-Expression 'git clone https://github.com/glfw/glfw' -ErrorAction SilentlyContinue
+
+      cd glfw
+
+      git pull
+
+      cd ..
+
+      Invoke-Expression 'mkdir CMake' -ErrorAction SilentlyContinue
 
       cd CMake
 
-      Invoke-Expression 'mkdir glm'-ErrorAction SilentlyContinue
+      Invoke-Expression 'mkdir glm' -ErrorAction SilentlyContinue
 
-      Invoke-Expression 'mkdir flatbuffers'-ErrorAction SilentlyContinue
+      Invoke-Expression 'mkdir flatbuffers' -ErrorAction SilentlyContinue
+
+      Invoke-Expression 'mkdir glfw' -ErrorAction SilentlyContinue
 
       cd glm
 
@@ -64,6 +75,24 @@ install:
       } else {
 
         cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
+
+        msbuild INSTALL.vcxproj;
+
+      }
+
+      cd ..
+
+      cd glfw
+
+      if($env:USE_MINGW -eq "yes") {
+
+        cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 -G "MinGW Makefiles" $env:APPVEYOR_BUILD_FOLDER/glfw;
+
+        mingw32-make install all;
+
+      } else {
+
+        cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glfw;
 
         msbuild INSTALL.vcxproj;
 
@@ -107,7 +136,7 @@ environment:
       MULTITHREADING: yes
 
 build_script:
-  scons -j2 build_type=test target=%TARGET% use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache=%APPVEYOR_BUILD_FOLDER%/.scons_cache multithreading=%MULTITHREADING%
+  scons -j2 build_type=tests target=%TARGET% use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache="%APPVEYOR_BUILD_FOLDER%/.scons_cache" multithreading=%MULTITHREADING%
 
 test_script:
-  - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_tests"
+  - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_unit_tests"
