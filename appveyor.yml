@@ -14,7 +14,15 @@ install:
 
       python -m pip install scons
 
-      if($env:USE_MINGW -eq "yes") { $env:PATH = "C:\MinGW\bin;$env:PATH" }
+      if($env:USE_MINGW -eq "yes") {
+      
+      $env:PATH = "C:\MinGW\bin;$env:PATH"
+
+      mingw-get update
+      
+      mingw-get upgrade
+      
+      }
 
       del (Get-Command sh.exe).path
 
