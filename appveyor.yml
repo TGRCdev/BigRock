@@ -14,18 +14,6 @@ install:
 
       python -m pip install scons
 
-      if($env:USE_MINGW -eq "yes") {
-      
-      $env:PATH = "C:\MinGW\bin;$env:PATH"
-
-      mingw-get update --verbose=0
-      
-      mingw-get upgrade --verbose=0
-      
-      }
-
-      del (Get-Command sh.exe).path
-
       Invoke-Expression 'git clone https://github.com/g-truc/glm'-ErrorAction SilentlyContinue
 
       cd glm
@@ -64,15 +52,9 @@ install:
 
       Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
 
-      if ($env:USE_MINGW -eq "yes") {
+      cmake -DGLM_TEST_ENABLE:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glm
 
-        cmake -DGLM_TEST_ENABLE:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" -E env CFLAGS="-m32" -E env LINKER_FLAGS="-m32" $env:APPVEYOR_BUILD_FOLDER/glm;
-
-        mingw32-make install all; } else {
-
-        cmake -DGLM_TEST_ENABLE:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" $env:APPVEYOR_BUILD_FOLDER/glm;
-
-        msbuild INSTALL.vcxproj; }
+      msbuild INSTALL.vcxproj
 
       cd ..
 
@@ -80,19 +62,9 @@ install:
 
       Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
 
-      if($env:USE_MINGW -eq "yes") {
+      cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
 
-        cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 -DCMAKE_SH="CMAKE_SH-NOTFOUND" -G "MinGW Makefiles" -E env CFLAGS="-m32" -E env LINKER_FLAGS="-m32" $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
-
-        mingw32-make install all;
-
-      } else {
-
-        cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
-
-        msbuild INSTALL.vcxproj;
-
-      }
+      msbuild INSTALL.vcxproj;
 
       cd ..
 
@@ -100,59 +72,29 @@ install:
 
       Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
 
-      if($env:USE_MINGW -eq "yes") {
+      cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glfw;
 
-        cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 -G "MinGW Makefiles" -E env CFLAGS="-m32" -E env LINKER_FLAGS="-m32" $env:APPVEYOR_BUILD_FOLDER/glfw;
-
-        mingw32-make install all;
-
-      } else {
-
-        cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glfw;
-
-        msbuild INSTALL.vcxproj;
-
-      }
+      msbuild INSTALL.vcxproj;
 
       cd $env:APPVEYOR_BUILD_FOLDER
 
 environment:
   matrix:
     - DOUBLES: no
-      USE_MINGW: no
-      TARGET: debug
-      MULTITHREADING: no
-    - DOUBLES: no
-      USE_MINGW: yes
       TARGET: debug
       MULTITHREADING: no
     - DOUBLES: yes
-      USE_MINGW: no
-      TARGET: debug
-      MULTITHREADING: no
-    - DOUBLES: yes
-      USE_MINGW: yes
       TARGET: debug
       MULTITHREADING: no
     - DOUBLES: no
-      USE_MINGW: no
       TARGET: release
       MULTITHREADING: no
     - DOUBLES: no
-      USE_MINGW: yes
-      TARGET: release
-      MULTITHREADING: no
-    - DOUBLES: no
-      USE_MINGW: no
-      TARGET: release
-      MULTITHREADING: yes
-    - DOUBLES: no
-      USE_MINGW: yes
       TARGET: release
       MULTITHREADING: yes
 
 build_script:
-  scons -j2 build_type=tests target=%TARGET% use_doubles=%DOUBLES% use_mingw=%USE_MINGW% cache="%APPVEYOR_BUILD_FOLDER%/.scons_cache" multithreading=%MULTITHREADING%
+  scons -j2 build_type=tests target=%TARGET% use_doubles=%DOUBLES% cache="%APPVEYOR_BUILD_FOLDER%/.scons_cache" multithreading=%MULTITHREADING%
 
 test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_unit_tests"
