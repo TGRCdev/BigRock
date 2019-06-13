@@ -18,9 +18,9 @@ install:
       
       $env:PATH = "C:\MinGW\bin;$env:PATH"
 
-      mingw-get update
+      mingw-get update --verbose=0
       
-      mingw-get upgrade
+      mingw-get upgrade --verbose=0
       
       }
 
