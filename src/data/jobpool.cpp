@@ -38,12 +38,16 @@ int JobPool::get_number_of_cores()
 JobPool::worker_t::worker_t()
 {
     thread_atomic_int_store(&working, 0);
-    workthread = NULL;
+    workthread = thread_ptr_t();
 }
 
 JobPool::worker_t::~worker_t()
 {
+    #if defined(__MINGW32__) && !defined(__MINGW64__)
+    if(workthread.p)
+    #else
     if(workthread)
+    #endif
     {
         thread_join(workthread);
         thread_destroy(workthread);
@@ -74,7 +78,11 @@ bool JobPool::worker_t::start(job_t &job, JobPool *pool)
     
     thread_atomic_int_store(&working, 1);
 
+    #if defined(__MINGW32__) && !defined(__MINGW64__)
+    if(workthread.p)
+    #else
     if(workthread)
+    #endif
     {
         thread_join(workthread);
         thread_destroy(workthread);

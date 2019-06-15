@@ -4,12 +4,6 @@ import platform, sys
 thrd_inc = [Dir('thirdparty/glad/include')]
 thrd_src = [Dir('thirdparty/glad/src')]
 
-testopts = Variables()
-testopts.Add(PathVariable('glfw_dir', 'The path to a valid GLFW installation.', '', PathVariable.PathAccept))
-testopts.Add(PathVariable('glfw_includes', 'The path to a valid GLFW installation\'s headers', '', PathVariable.PathAccept))
-testopts.Add(PathVariable('glfw_libs', 'The path to a valid GLFW installation\'s binaries', '', PathVariable.PathAccept))
-testopts.Update(env)
-
 if env['glfw_dir'] == '':
     if platform.system() == 'Windows':
         env['glfw_dir'] = Dir('C:/Program Files (x86)/GLFW')
@@ -42,4 +36,4 @@ sources += [File("test.cpp")]
 
 env.Program("bin/BigRock_Test", source=sources)
 
-Help(testopts.GenerateHelpText(env))
+Help(opts.GenerateHelpText(env))

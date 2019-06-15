@@ -26,6 +26,9 @@ opts.Add(BoolVariable('fast_maths', 'Whether or not to use spooky floating point
 opts.Add(PathVariable('cache', 'If defined, caches build files here. Mostly for Travis CI and AppVeyor.', '', PathVariable.PathAccept))
 opts.Add(BoolVariable('multithreading', 'Whether or not to enable multithreading in certain areas of code.', True))
 opts.Add(BoolVariable('static_link_deps', 'When true, statically links all dependent libraries. Only for GCC/MinGW.', False))
+opts.Add(PathVariable('glfw_dir', 'The path to a valid GLFW installation. Only needed when build_type=tests', '', PathVariable.PathAccept))
+opts.Add(PathVariable('glfw_includes', 'The path to a valid GLFW installation\'s headers. Only needed when build_type=tests', '', PathVariable.PathAccept))
+opts.Add(PathVariable('glfw_libs', 'The path to a valid GLFW installation\'s binaries. Only needed when build_type=tests', '', PathVariable.PathAccept))
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -125,7 +128,7 @@ else:
     if env['fast_maths']:
         env.Append(CCFLAGS = '-ffast-math')
     
-    env.Append(CXXFLAGS = '-std=gnu++11', LIBS=['pthread'])
+    env.Append(CXXFLAGS = '-std=c++11', LIBS=['pthread'])
     if env['CC'] == 'gcc' and env['static_link_deps']:
         env.Append(CCFLAGS = ['-static-libgcc', '-static'], CXXFLAGS = ['-static-libstdc++'])
 

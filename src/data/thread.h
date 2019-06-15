@@ -35,7 +35,11 @@ void thread_yield( void );
 void thread_set_high_priority( void );
 void thread_exit( int return_code );
 
+#if defined(__MINGW32__) && !defined(__MINGW64__)
+typedef ptw32_handle_t thread_ptr_t;
+#else
 typedef void* thread_ptr_t;
+#endif
 thread_ptr_t thread_create( int (*thread_proc)( void* ), void* user_data, char const* name, int stack_size );
 void thread_destroy( thread_ptr_t thread );
 int thread_join( thread_ptr_t thread );
@@ -630,6 +634,9 @@ struct thread_queue_t
 #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
 
     #include <pthread.h>
+    #if defined(__MINGW32__) && !defined(__MINGW64__)
+    #include <time.h>
+    #endif
     #include <sys/time.h>
     #include <string.h>
     #include <cstdint>
@@ -654,7 +661,11 @@ thread_id_t thread_current_thread_id( void )
 
     #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
     
+        #if defined(__MINGW32__) && !defined(__MINGW64__)
+        return (void*) pthread_self().p;
+        #else
         return (void*) pthread_self();
+        #endif
 
     #else 
         #error Unknown platform.
@@ -727,12 +738,11 @@ thread_ptr_t thread_create( int (*thread_proc)( void* ), void* user_data, char c
 
         pthread_t thread;
         if( 0 != pthread_create( &thread, NULL, ( void* (*)( void * ) ) thread_proc, user_data ) )
-            return NULL;
+            return thread_ptr_t();
 
         #if !defined( __APPLE__ ) // max doesn't support pthread_setname_np. alternatives?
             if( name ) pthread_setname_np( thread, name );
         #endif
-
         return (thread_ptr_t) thread;
     
     #else 
@@ -1197,7 +1207,7 @@ void thread_atomic_ptr_store( thread_atomic_ptr_t* atomic, void* desired )
     
     #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
 
-        __sync_lock_test_and_set( &atomic->ptr, desired );
+        __sync_lock_test_and_set( &atomic->ptr, reinterpret_cast<uintptr_t>(desired) );
         __sync_lock_release( &atomic );
     
     #else 
@@ -1219,7 +1229,7 @@ void* thread_atomic_ptr_swap( thread_atomic_ptr_t* atomic, void* desired )
     
     #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
 
-        void* old = __sync_lock_test_and_set( &atomic->ptr, desired );
+        void* old = __sync_lock_test_and_set( &atomic->ptr,reinterpret_cast<uintptr_t>(desired) );
         __sync_lock_release( &atomic );
         return old;
     
@@ -1237,7 +1247,7 @@ void* thread_atomic_ptr_compare_and_swap( thread_atomic_ptr_t* atomic, void* exp
     
     #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
 
-        return __sync_val_compare_and_swap( &atomic->ptr, expected, desired );
+        return __sync_val_compare_and_swap( &atomic->ptr, reinterpret_cast<uintptr_t>(expected), reinterpret_cast<uintptr_t>(desired) );
 
     #else 
         #error Unknown platform.

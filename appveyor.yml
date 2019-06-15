@@ -14,6 +14,28 @@ install:
 
       python -m pip install scons
 
+      if($env:USE_MINGW -eq "yes") { 
+
+        $env:PATH = "C:/MinGW/bin;$env:PATH"
+
+        mingw-get update;
+
+        mingw-get upgrade;
+      
+        mingw-get install mingw32-pthreads;
+
+        $env:CMAKE_GENERATOR = "MinGW Makefiles"
+
+        $env:CMAKE_INSTALL = mingw32-make install all
+        
+      } else {
+
+        $env:CMAKE_GENERATOR = "Visual Studio 14 2015"
+
+        $env:CMAKE_INSTALL = msbuild INSTALL.vcxproj
+
+      }
+
       Invoke-Expression 'git clone https://github.com/g-truc/glm'-ErrorAction SilentlyContinue
 
       cd glm
@@ -52,9 +74,9 @@ install:
 
       Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
 
-      cmake -DGLM_TEST_ENABLE:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glm
+      cmake -G $env:CMAKE_GENERATOR -DCMAKE_SH="CMAKE_SH-NOTFOUND" -DGLM_TEST_ENABLE:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glm
 
-      msbuild INSTALL.vcxproj
+      $env:CMAKE_INSTALL
 
       cd ..
 
@@ -62,9 +84,9 @@ install:
 
       Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
 
-      cmake -DFLATBUFFERS_BUILD_TESTS:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/flatbuffers;
+      cmake -G $env:CMAKE_GENERATOR -DCMAKE_SH="CMAKE_SH-NOTFOUND" -DFLATBUFFERS_BUILD_TESTS:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/flatbuffers
 
-      msbuild INSTALL.vcxproj;
+      $env:CMAKE_INSTALL
 
       cd ..
 
@@ -72,9 +94,9 @@ install:
 
       Invoke-Expression 'del CMakeCache.txt' -ErrorAction SilentlyContinue
 
-      cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glfw;
+      cmake -G $env:CMAKE_GENERATOR -DCMAKE_SH="CMAKE_SH-NOTFOUND" -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 $env:APPVEYOR_BUILD_FOLDER/glfw;
 
-      msbuild INSTALL.vcxproj;
+      $env:CMAKE_INSTALL
 
       cd $env:APPVEYOR_BUILD_FOLDER
 
@@ -83,18 +105,31 @@ environment:
     - DOUBLES: no
       TARGET: debug
       MULTITHREADING: no
+      USE_MINGW: no
+    - DOUBLES: no
+      TARGET: debug
+      MULTITHREADING: no
+      USE_MINGW: yes
     - DOUBLES: yes
       TARGET: debug
       MULTITHREADING: no
+      USE_MINGW: no
     - DOUBLES: no
       TARGET: release
       MULTITHREADING: no
+      USE_MINGW: no
     - DOUBLES: no
       TARGET: release
       MULTITHREADING: yes
+      USE_MINGW: no
+    - DOUBLES: no
+      TARGET: release
+      MULTITHREADING: yes
+      USE_MINGW: yes
+
 
 build_script:
-  scons -j2 build_type=tests target=%TARGET% use_doubles=%DOUBLES% cache="%APPVEYOR_BUILD_FOLDER%/.scons_cache" multithreading=%MULTITHREADING%
+  scons -j2 build_type=tests use_mingw=%USE_MINGW% target=%TARGET% use_doubles=%DOUBLES% cache="%APPVEYOR_BUILD_FOLDER%/.scons_cache" multithreading=%MULTITHREADING%
 
 test_script:
   - "%APPVEYOR_BUILD_FOLDER%/test/bin/run_unit_tests"
