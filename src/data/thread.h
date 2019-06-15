@@ -1203,9 +1203,13 @@ void thread_atomic_ptr_store( thread_atomic_ptr_t* atomic, void* desired )
         #pragma warning( disable: 4312 ) // conversion from 'LONG' to 'PVOID' of greater size
         InterlockedExchangePointer( &atomic->ptr, desired );
         #pragma warning( pop )
-
     
-    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
+    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ )
+
+        __sync_lock_test_and_set( &atomic->ptr, desired );
+        __sync_lock_release( &atomic );
+
+    #elif defined( __MINGW32__ )
 
         __sync_lock_test_and_set( &atomic->ptr, reinterpret_cast<uintptr_t>(desired) );
         __sync_lock_release( &atomic );
@@ -1227,7 +1231,13 @@ void* thread_atomic_ptr_swap( thread_atomic_ptr_t* atomic, void* desired )
         return InterlockedExchangePointer( &atomic->ptr, desired );
         #pragma warning( pop )
     
-    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
+    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ )
+
+        void* old = __sync_lock_test_and_set( &atomic->ptr, desired );
+        __sync_lock_release( &atomic );
+        return old;
+    
+    #elif defined( __MINGW32__ )
 
         void* old = __sync_lock_test_and_set( &atomic->ptr,reinterpret_cast<uintptr_t>(desired) );
         __sync_lock_release( &atomic );
@@ -1245,7 +1255,11 @@ void* thread_atomic_ptr_compare_and_swap( thread_atomic_ptr_t* atomic, void* exp
     
         return InterlockedCompareExchangePointer( &atomic->ptr, desired, expected );
     
-    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
+    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ )
+
+        return __sync_val_compare_and_swap( &atomic->ptr, expected, desired );
+
+    #elif defined( __MINGW32__ )
 
         return __sync_val_compare_and_swap( &atomic->ptr, reinterpret_cast<uintptr_t>(expected), reinterpret_cast<uintptr_t>(desired) );
 
