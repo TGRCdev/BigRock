@@ -21,6 +21,7 @@ using namespace std;
 
 int main()
 {
+    #undef small
     Cell cell;
     cout << "Tool Application Timing Test" << endl;
     cout << "Number of cores: " << JobPool::get_number_of_cores() << endl;

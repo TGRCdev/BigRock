@@ -132,6 +132,9 @@ else:
     if env['CC'] == 'gcc' and env['static_link_deps']:
         env.Append(CCFLAGS = ['-static-libgcc', '-static'], CXXFLAGS = ['-static-libstdc++'])
 
+if platform.system() == 'Windows':
+    env.Append(LIBS=['winmm'])
+
 env.Append(CPPDEFINES = ['GLM_FORCE_CXX11', ('BR_MAX_CELL_DEPTH', env['max_cell_depth'])])
 
 sources = []

@@ -632,11 +632,10 @@ struct thread_queue_t
     #pragma pack(pop)
     
 #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
-
-    #include <pthread.h>
-    #if defined(__MINGW32__) && !defined(__MINGW64__)
-    #include <time.h>
+    #if defined( __MINGW32__ )
+        #include <windows.h>
     #endif
+    #include <pthread.h>
     #include <sys/time.h>
     #include <string.h>
     #include <cstdint>
@@ -1271,7 +1270,7 @@ void* thread_atomic_ptr_compare_and_swap( thread_atomic_ptr_t* atomic, void* exp
 
 void thread_timer_init( thread_timer_t* timer )
     {
-    #if defined( _WIN32 ) && defined( _MSC_VER )
+    #if defined( _WIN32 )
 
         // Compile-time size check
         #pragma warning( push )
@@ -1285,7 +1284,7 @@ void thread_timer_init( thread_timer_t* timer )
 
         *(HANDLE*)timer = CreateWaitableTimer( NULL, TRUE, NULL );
 
-    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
+    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ )
 
         // Nothing
 
@@ -1297,7 +1296,7 @@ void thread_timer_init( thread_timer_t* timer )
 
 void thread_timer_term( thread_timer_t* timer )
     {
-    #if defined( _WIN32 ) && defined( _MSC_VER )
+    #if defined( _WIN32 )
 
         CloseHandle( *(HANDLE*)timer );
     
@@ -1305,7 +1304,7 @@ void thread_timer_term( thread_timer_t* timer )
         if( timeGetDevCaps( &tc, sizeof( TIMECAPS ) ) == TIMERR_NOERROR ) 
             timeEndPeriod( tc.wPeriodMin );
 
-    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
+    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ )
 
         // Nothing
     
@@ -1317,7 +1316,7 @@ void thread_timer_term( thread_timer_t* timer )
 
 void thread_timer_wait( thread_timer_t* timer, THREAD_U64 nanoseconds )
     {
-    #if defined( _WIN32 ) && defined( _MSC_VER )
+    #if defined( _WIN32 )
 
         LARGE_INTEGER due_time;
         due_time.QuadPart = - (LONGLONG) ( nanoseconds / 100 );
@@ -1325,16 +1324,17 @@ void thread_timer_wait( thread_timer_t* timer, THREAD_U64 nanoseconds )
         (void) b;
         WaitForSingleObject( *(HANDLE*)timer, INFINITE ); 
     
-    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ ) || defined( __MINGW32__ )
+    #elif defined( __linux__ ) || defined( __APPLE__ ) || defined( __ANDROID__ )
 
         struct timespec rem;
         struct timespec req;
         req.tv_sec = nanoseconds / 1000000000ULL;
         req.tv_nsec = nanoseconds - req.tv_sec * 1000000000ULL;
+
         while( nanosleep( &req, &rem ) )
             req = rem;
     
-    #else 
+    #else
         #error Unknown platform.
     #endif
     }

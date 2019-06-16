@@ -7,9 +7,9 @@ thrd_src = [Dir('thirdparty/glad/src')]
 if env['glfw_dir'] == '':
     if platform.system() == 'Windows':
         env['glfw_dir'] = Dir('C:/Program Files (x86)/GLFW')
-if env['glfw_includes'] == '':
+if env['glfw_includes'] == '' and env['glfw_dir'] != '':
     env['glfw_includes'] = str(env['glfw_dir']) + '/include'
-if env['glfw_libs'] == '':
+if env['glfw_libs'] == '' and env['glfw_dir'] != '':
     env['glfw_libs'] = str(env['glfw_dir']) + '/lib'
 
 env.Append(CPPPATH = env['glfw_includes'], LIBPATH = env['glfw_libs'], LIBS=['glfw3'])
