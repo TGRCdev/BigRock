@@ -9,7 +9,7 @@
 #include <string>
 #include <sstream>
 
-void print_vec3(Vector3 vec)
+void print_vec3(glm::vec3 vec)
 {
     std::cout << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 }

@@ -27,7 +27,7 @@ struct Action
     } data;
 
     /// Updates the Point using the tool and this action.
-    virtual void update(const Tool &t, const Vector3 position, Point &v, ToolQueryResult *res = NULL) const = 0;
+    virtual void update(const Tool &t, const glm::vec3 position, Point &v, ToolQueryResult *res = NULL) const = 0;
     
     virtual ActionType get_action_type() const = 0;
 

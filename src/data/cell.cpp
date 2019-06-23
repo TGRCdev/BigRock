@@ -8,16 +8,6 @@ namespace data {
 
 using namespace flatbuffers;
 
-#if BR_USE_DOUBLE_PRECISION
-#define CellType schemas::CellDouble
-#define Vec3 schemas::Vec3d
-#define CellTag schemas::Cell_CellDouble
-#else
-#define CellType schemas::CellSingle
-#define Vec3 schemas::Vec3f
-#define CellTag schemas::Cell_CellSingle
-#endif
-
 Cell::Cell(bool init_root)
 {
     children = NULL;
@@ -37,16 +27,15 @@ Cell::Cell(bool init_root)
         owned_vertices = 0;
         cell_count = NULL;
     }
-    this->position = Vector3(0.0f,0.0f,0.0f);
+    this->position = glm::vec3(0.0f,0.0f,0.0f);
     subdiv_level = 0;
 }
 
-template <class T>
-void Cell::load(const T &cell, PointMap &points)
+void Cell::load(const schemas::Cell &cell, PointMap &points)
 {
     this->owned_vertices = cell.owned_vertices();
     auto v = cell.position();
-    this->position = Vector3(v->x(), v->y(), v->z());
+    this->position = glm::vec3(v->x(), v->y(), v->z());
     const Vector<Offset<schemas::Point> > *data_points = cell.corners();
     for(int i = 0; i < 8; i++)
     {
@@ -67,12 +56,12 @@ void Cell::load(const T &cell, PointMap &points)
     }
 
     // Children can be 8 or 0
-    const Vector<Offset<T>> *data_children = cell.children();
+    const Vector<Offset<schemas::Cell>> *data_children = cell.children();
     if(data_children->size() == 8 && this->subdiv_level + 1 < BR_MAX_CELL_DEPTH)
     {
         children = static_cast<Cell*>(malloc(sizeof(Cell) * 8));
         for(int i = 0; i < 8; i++)
-            new (children + i) (Cell) (*data_children->Get(i), points, this->cell_count, this->subdiv_level + 1, this->position + (GRID_VERTICES[i] / br_real_t(1ULL << (subdiv_level + 1)))); // Placement new
+            new (children + i) (Cell) (*data_children->Get(i), points, this->cell_count, this->subdiv_level + 1, this->position + (GRID_VERTICES[i] / float(1ULL << (subdiv_level + 1)))); // Placement new
 
         *cell_count += 8;
     }
@@ -82,20 +71,16 @@ void Cell::load(const T &cell, PointMap &points)
     }
 }
 
-Cell::Cell(const schemas::CellRoot &cell)
+Cell::Cell(const schemas::Cell &cell)
 {
     PointMap p;
-    this->position = Vector3();
+    this->position = glm::vec3();
     this->cell_count = new unsigned int(1);
     this->subdiv_level = 0;
-    if(cell.root_type() == schemas::Cell_CellSingle)
-        this->load(*cell.root_as_CellSingle(), p);
-    else if(cell.root_type() == schemas::Cell_CellDouble)
-        this->load(*cell.root_as_CellDouble(), p);
+    this->load(cell, p);
 }
 
-template <class T>
-Cell::Cell(const T &cell, PointMap &p, unsigned int *cell_count, unsigned char subdiv_level, Vector3 position)
+Cell::Cell(const schemas::Cell &cell, PointMap &p, unsigned int *cell_count, unsigned char subdiv_level, glm::vec3 position)
 {
     this->cell_count = cell_count;
     this->subdiv_level = subdiv_level;
@@ -157,9 +142,9 @@ void Cell::subdivide()
         new (children + i) (Cell) (false); // Placement new
         children[i].subdiv_level = this->subdiv_level + 1;
         children[i].cell_count = this->cell_count;
-        children[i].position = this->position + (GRID_VERTICES[i] / br_real_t(1ULL << (subdiv_level + 1)));
+        children[i].position = this->position + (GRID_VERTICES[i] / float(1ULL << (subdiv_level + 1)));
         glm::vec<3, int> cpos = GRID_VERTICES[i];
-        bool badpos = glm::any(glm::greaterThanEqual(children[i].position, Vector3(1.0f)));// DEBUG
+        bool badpos = glm::any(glm::greaterThanEqual(children[i].position, glm::vec3(1.0f)));// DEBUG
 
         for(int j = 0; j < 8; j++)
         {
@@ -217,9 +202,9 @@ bool Cell::can_collapse() const
     return collapse;
 }
 
-int Cell::get_index_containing_pos(const Vector3 pos) const
+int Cell::get_index_containing_pos(const glm::vec3 pos) const
 {
-    Vector3 midpoint = glm::mix(get_corner_pos(0), get_corner_pos(7), 0.5);
+    glm::vec3 midpoint = glm::mix(get_corner_pos(0), get_corner_pos(7), 0.5);
     int index = 0;
 
     if(pos.x > midpoint.x)
@@ -232,7 +217,7 @@ int Cell::get_index_containing_pos(const Vector3 pos) const
     return index;
 }
 
-Point Cell::sample(Vector3 point, bool recursive) const
+Point Cell::sample(glm::vec3 point, bool recursive) const
 {
     if(has_children() && recursive)
     {
@@ -240,12 +225,12 @@ Point Cell::sample(Vector3 point, bool recursive) const
     }
     else
     {
-        Vector3 t = (point - position) / (this->get_corner_pos(7) - position);
+        glm::vec3 t = (point - position) / (this->get_corner_pos(7) - position);
         return sample_local(t);
     }
 }
 
-Point Cell::sample_local(Vector3 point) const
+Point Cell::sample_local(glm::vec3 point) const
 {
     Point x_plane[4];
     x_plane[0] = this->corners[0]->interpolate(*this->corners[1], point.x);
@@ -412,7 +397,7 @@ void Cell::apply_unthreaded(const Tool &t, const Action &a, const int max_depth)
     }
 }
 
-Offset<CellType> Cell::serialize(FlatBufferBuilder &builder, std::map<const Point*, Offset<schemas::Point> > &point_offsets) const
+Offset<schemas::Cell> Cell::serialize(FlatBufferBuilder &builder, std::map<const Point*, Offset<schemas::Point> > &point_offsets) const
 {
     std::vector<Offset<schemas::Point>> offsets;
     offsets.reserve(8);
@@ -441,7 +426,7 @@ Offset<CellType> Cell::serialize(FlatBufferBuilder &builder, std::map<const Poin
         offsets.push_back(offs);
     }
 
-    std::vector<Offset<CellType> > child_offsets;
+    std::vector<Offset<schemas::Cell> > child_offsets;
 
     if(has_children() && subdiv_level < (FLATBUFFERS_MAX_PARSING_DEPTH - 2))
     {
@@ -450,13 +435,9 @@ Offset<CellType> Cell::serialize(FlatBufferBuilder &builder, std::map<const Poin
             child_offsets.push_back(children[i].serialize(builder, point_offsets));
     }
 
-    auto v = Vec3(this->position.x, this->position.y, this->position.z);
+    auto v = schemas::Vec3(this->position.x, this->position.y, this->position.z);
 
-    #if BR_USE_DOUBLE_PRECISION
-    return schemas::CreateCellDoubleDirect(builder,
-    #else
-    return schemas::CreateCellSingleDirect(builder,
-    #endif
+    return schemas::CreateCellDirect(builder,
         &v,
         &offsets,
         &child_offsets,
@@ -467,10 +448,9 @@ Offset<CellType> Cell::serialize(FlatBufferBuilder &builder, std::map<const Poin
 std::unique_ptr<std::string> Cell::serialize() const
 {
     std::map<const Point*, Offset<schemas::Point> > point_offsets;
-    FlatBufferBuilder builder((*cell_count * sizeof(CellType)) + sizeof(schemas::CellRoot));
+    FlatBufferBuilder builder((*cell_count * sizeof(schemas::Cell)) + sizeof(schemas::Cell));
     auto cell_offs = serialize(builder, point_offsets);
-    auto offs = schemas::CreateCellRoot(builder, CellTag, cell_offs.Union());
-    builder.Finish(offs);
+    builder.Finish(cell_offs);
     return std::unique_ptr<std::string>(new std::string(reinterpret_cast<char*>(builder.GetBufferPointer()), builder.GetSize()));
 }
 
@@ -480,11 +460,11 @@ std::unique_ptr<Cell> Cell::deserialize(const void *buf, size_t length)
         return nullptr;
     
     Verifier v = Verifier(reinterpret_cast<const uint8_t*>(buf), length);
-    bool ok = schemas::VerifyCellRootBuffer(v);
+    bool ok = schemas::VerifyCellBuffer(v);
     if(!ok)
         return nullptr;
     
-    return std::unique_ptr<Cell>(new Cell(*schemas::GetCellRoot(buf)));
+    return std::unique_ptr<Cell>(new Cell(*schemas::GetCell(buf)));
 }
 
 unsigned char Cell::get_cube_index() const

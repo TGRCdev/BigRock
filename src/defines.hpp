@@ -21,15 +21,9 @@
 #endif
 
 #if BR_USE_DOUBLE_PRECISION
-#define Vector3 glm::dvec3
-#define Mat4 glm::dmat4
-#define Quat glm::dquat
-#define br_real_t double
+typedef double isovalue_t;
 #else
-#define Vector3 glm::vec3
-#define Mat4 glm::mat4
-#define Quat glm::quat
-#define br_real_t float
+typedef float isovalue_t;
 #endif
 
 #endif

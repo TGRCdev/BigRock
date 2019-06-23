@@ -17,7 +17,7 @@ namespace data {
 
 class Cell
 {
-    Vector3 position;
+    glm::vec3 position;
     Point *corners[8];
     Cell *children; // Cell is a leaf if children in NULL, else children is size 8.
     char owned_vertices; // Bit field describing which vertices this cell can delete.
@@ -25,13 +25,7 @@ class Cell
 
     unsigned int *cell_count; // Pointer to the amount of cells in this tree of Cells. Passed by parent.
 
-    flatbuffers::Offset<
-    #if BR_USE_DOUBLE_PRECISION
-    schemas::CellDouble
-    #else
-    schemas::CellSingle
-    #endif
-    > serialize(flatbuffers::FlatBufferBuilder &builder, std::map<const Point*, flatbuffers::Offset<schemas::Point> > &point_offsets) const;
+    flatbuffers::Offset<schemas::Cell> serialize(flatbuffers::FlatBufferBuilder &builder, std::map<const Point*, flatbuffers::Offset<schemas::Point> > &point_offsets) const;
 
     typedef std::map<const schemas::Point*, Point*> PointMap;
     
@@ -42,12 +36,10 @@ class Cell
 
     void apply_unthreaded(const Tool &t, const Action &a, const int max_depth);
 
-    template<class T>
-    void load(const T &cell, PointMap &points);
-    template<class T>
-    Cell(const T &Cell, PointMap &points, unsigned int *cell_count, unsigned char subdiv_level, Vector3 position);
+    void load(const schemas::Cell &cell, PointMap &points);
+    Cell(const schemas::Cell &Cell, PointMap &points, unsigned int *cell_count, unsigned char subdiv_level, glm::vec3 position);
 
-    Cell(const schemas::CellRoot &cell);
+    Cell(const schemas::Cell &cell);
 
     public:
     
@@ -76,17 +68,17 @@ class Cell
     bool can_collapse() const;
 
     /// Interpolates the corners using the global point given
-    Point sample(Vector3 point, bool recursive = true) const;
+    Point sample(glm::vec3 point, bool recursive = true) const;
     /// Interpolates the corners using the local point with values [0-1] given
-    Point sample_local(Vector3 point) const;
+    Point sample_local(glm::vec3 point) const;
 
     void apply(const Tool &t, const Action &a, const int max_depth = -1, bool multithreaded = (JobPool::get_number_of_cores() > 1), unsigned char thread_count = std::max(JobPool::get_number_of_cores(), 2));
 
     const Point &get_corner(int index) const {return *corners[index];}
     Point &get_corner(int index) {return *corners[index];}
-    Vector3 get_corner_pos(int index) const {return position + (GRID_VERTICES[index] / br_real_t(1ULL << subdiv_level));}
+    glm::vec3 get_corner_pos(int index) const {return position + (GRID_VERTICES[index] / float(1ULL << subdiv_level));}
 
-    int get_index_containing_pos(const Vector3 pos) const;
+    int get_index_containing_pos(const glm::vec3 pos) const;
 
     unsigned char get_depth() const {return subdiv_level;}
     Cell *get_child(int index) {return (has_children() ? &children[index] : NULL);}

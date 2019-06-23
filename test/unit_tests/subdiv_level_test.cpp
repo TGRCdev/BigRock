@@ -26,10 +26,10 @@ int main()
     cout << "Tool Application Timing Test" << endl;
     cout << "Number of cores: " << JobPool::get_number_of_cores() << endl;
     Ellipsoid whole; // A tool taking up space in the entire cell
-    whole.transform = Vector3(0.5f);
+    whole.transform = glm::vec3(0.5f);
     Ellipsoid corner; // A tool only taking up the corner of the cell
     Ellipsoid small; // A tool only taking up a very small section of the corner of the cell
-    small.transform.scale = Vector3(0.01f);
+    small.transform.scale = glm::vec3(0.01f);
     Emplace e;
     printf("Subdiv|Whole time |Corner time|Small time |\n");
     printf("%s+\n", string(42,'-').c_str());

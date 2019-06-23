@@ -17,10 +17,10 @@ struct Tool
     Transform transform;
 
     /// Returns the density of the point in the tool transformed by the tool's transform
-    float value(Vector3 point) const;
+    float value(glm::vec3 point) const;
 
     /// Returns the density of the point in the tool without being transformed
-    virtual float value_local(Vector3 point) const = 0;
+    virtual float value_local(glm::vec3 point) const = 0;
 
     /// Gets the AABB of the tool, which represents the maximum possible area that the tool can affc
     virtual AABB get_aabb() const;

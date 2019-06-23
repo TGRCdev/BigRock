@@ -16,7 +16,7 @@
 namespace bigrock {
 namespace data {
 
-float Tool::value(Vector3 point) const
+float Tool::value(glm::vec3 point) const
 {
     return value_local(transform.to_local(point));
 }
@@ -25,7 +25,7 @@ AABB Tool::get_aabb() const
 {
     AABB ret;
     for(int i = 0; i < 8; i++)
-        ret.extend(transform.to_global(GRID_VERTICES[i] - Vector3(0.5f)));
+        ret.extend(transform.to_global(GRID_VERTICES[i] - glm::vec3(0.5f)));
     return ret;
 }
 
@@ -41,8 +41,8 @@ std::string Tool::serialize() const
         return std::string();
     }
     flatbuffers::FlatBufferBuilder builder;
-    auto trns = builder.CreateStruct<TransformType>(this->transform);
-    auto tool = schemas::CreateTool(builder, TransformTag, trns.Union(), ttype);
+    schemas::Transform trns = this->transform;
+    auto tool = schemas::CreateTool(builder, &trns, ttype);
     builder.Finish(tool);
     return std::string(reinterpret_cast<char*>(builder.GetBufferPointer()), static_cast<size_t>(builder.GetSize()));
 }
@@ -68,18 +68,7 @@ std::unique_ptr<Tool> Tool::deserialize(const void *buf, size_t length)
     if(!newtool)
         return nullptr;
     
-    auto trnstype = tool->transform_type();
-    switch(trnstype)
-    {
-        case schemas::Transform_Transformd:
-        newtool->transform = tool->transform_as_Transformd();
-        break;
-        case schemas::Transform_Transformf:
-        newtool->transform = tool->transform_as_Transformf();
-        break;
-        default:
-        break;
-    }
+    newtool->transform = tool->transform();
     return std::unique_ptr<Tool>(newtool);
 }
 

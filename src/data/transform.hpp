@@ -14,24 +14,22 @@ namespace data {
     struct Transform
     {
         Transform();
-        Transform(Vector3 origin);
-        Transform(Vector3 origin, Quat rotation);
-        Transform(Vector3 origin, Quat rotation, Vector3 scale);
+        Transform(glm::vec3 origin);
+        Transform(glm::vec3 origin, glm::quat rotation);
+        Transform(glm::vec3 origin, glm::quat rotation, glm::vec3 scale);
         Transform(const Transform &other);
 
-        Transform(const schemas::Transformf *trns);
-        Transform(const schemas::Transformd *trns);
+        Transform(const schemas::Transform *trns);
 
-        Vector3 origin;
-        Quat rotation;
-        Vector3 scale;
+        glm::vec3 origin;
+        glm::quat rotation;
+        glm::vec3 scale;
         
-        Vector3 to_global(Vector3 point) const;
-        Vector3 to_local(Vector3 point) const;
+        glm::vec3 to_global(glm::vec3 point) const;
+        glm::vec3 to_local(glm::vec3 point) const;
 
-        operator Mat4() const;
-        operator schemas::Transformf() const;
-        operator schemas::Transformd() const;
+        operator glm::mat4() const;
+        operator schemas::Transform() const;
 
         static const Transform identity;
     };

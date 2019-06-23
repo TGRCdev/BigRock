@@ -4,7 +4,7 @@ namespace schemas;
 
 table Point // Cannot be a struct because Cell corners are shared
 {
-    isovalue:float = -1.0;
+    isovalue:float;
     material:uint8;
 }
 

@@ -9,7 +9,7 @@ Emplace::Emplace(const unsigned char material)
     this->data.emplace.material = material;
 }
 
-void Emplace::update(const Tool &t, const Vector3 position, Point &v, ToolQueryResult *res) const
+void Emplace::update(const Tool &t, const glm::vec3 position, Point &v, ToolQueryResult *res) const
 {
     float val = t.value(position);
     if(val > -1)

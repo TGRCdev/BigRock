@@ -23,7 +23,7 @@ int main()
 
     for(int i = 0; i < vec_count; i++)
     {
-        Vector3 vec = Vector3(rand_range(-0.5, 0.5), rand_range(-0.5, 0.5), rand_range(-0.5, 0.5));
+        glm::vec3 vec = glm::vec3(rand_range(-0.5, 0.5), rand_range(-0.5, 0.5), rand_range(-0.5, 0.5));
         cout << setw(5) << i << "| "; print_vec3(vec); cout << " |" << setw(8) << glm::length(vec) << "|" << setw(9) << tool.value(vec) << endl;
     }
 }

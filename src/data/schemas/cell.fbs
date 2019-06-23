@@ -5,31 +5,12 @@ include "point.fbs";
 
 namespace schemas;
 
-table CellSingle // Single precision
+table Cell
 {
-    position:Vec3f;
+    position:Vec3;
     corners:[Point] (required);
-    children:[CellSingle];
-    owned_vertices:byte;
+    children:[Cell];
+    owned_vertices:byte; // TODO: Make this obsolete
 }
 
-table CellDouble // Double precision
-{
-    position:Vec3d;
-    corners:[Point] (required);
-    children:[CellDouble];
-    owned_vertices:byte;
-}
-
-union Cell
-{
-    CellSingle,
-    CellDouble
-}
-
-table CellRoot
-{
-    root:Cell (required);
-}
-
-root_type CellRoot;
+root_type Cell;

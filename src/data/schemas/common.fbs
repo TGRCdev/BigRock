@@ -1,26 +1,12 @@
 namespace schemas;
 
-struct Vec3f
+struct Vec3
 {
     x:float;
     y:float;
     z:float;
 }
-
-struct Vec3d
-{
-    x:double;
-    y:double;
-    z:double;
-}
-
-union Vec3
-{
-    Vec3f,
-    Vec3d
-}
-
-struct Vec4f
+struct Vec4
 {
     x:float;
     y:float;
@@ -28,36 +14,9 @@ struct Vec4f
     w:float;
 }
 
-struct Vec4d
+struct Transform
 {
-    x:double;
-    y:double;
-    z:double;
-    w:double;
-}
-
-union Vec4
-{
-    Vec4f,
-    Vec4d
-}
-
-struct Transformf
-{
-    origin:Vec3f;
-    rotation:Vec4f;
-    scale:Vec3f;
-}
-
-struct Transformd
-{
-    origin:Vec3d;
-    rotation:Vec4d;
-    scale:Vec3d;
-}
-
-union Transform
-{
-    Transformf,
-    Transformd
+    origin:Vec3;
+    rotation:Vec4;
+    scale:Vec3;
 }

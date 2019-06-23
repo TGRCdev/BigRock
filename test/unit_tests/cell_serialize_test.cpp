@@ -58,17 +58,17 @@ int main()
     cell.reset(new Cell(true));
     cout << "Applying a 1.0 diameter sphere tool at (0.5, 0.5, 0.5) at subdivision level 5" << endl;
     tools::Ellipsoid t;
-    t.transform.scale = Vector3(1.0f);
-    t.transform.origin = Vector3(0.5f);
+    t.transform.scale = glm::vec3(1.0f);
+    t.transform.origin = glm::vec3(0.5f);
     actions::Emplace a;
     clock_t start = clock();
     cell->apply(t, a, 5);
     clock_t end = clock();
     cout << "Tool application took " << (end - start) << " clocks (about " << ((end - start) / (CLOCKS_PER_SEC/1000)) << " milliseconds)" << endl;
 
-    cout << "Center sample: " << cell->sample(Vector3(0.5f,0.5f,0.5f)).isovalue << endl;
-    cout << "Edge sample: " << cell->sample(Vector3(0.0f,0.5f,0.5f)).isovalue << endl;
-    Vector3 rpoint = Vector3(rand_range(0.0f, 1.0f), rand_range(0.0f, 1.0f), rand_range(0.0f, 1.0f));
+    cout << "Center sample: " << cell->sample(glm::vec3(0.5f,0.5f,0.5f)).isovalue << endl;
+    cout << "Edge sample: " << cell->sample(glm::vec3(0.0f,0.5f,0.5f)).isovalue << endl;
+    glm::vec3 rpoint = glm::vec3(rand_range(0.0f, 1.0f), rand_range(0.0f, 1.0f), rand_range(0.0f, 1.0f));
     cout << "Random sample at "; print_vec3(rpoint); cout << ": " << cell->sample(rpoint).isovalue << endl;
     std::unique_ptr<std::string> outstr = cell->serialize();
     if(!outstr)

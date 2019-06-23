@@ -9,13 +9,13 @@ AABB::AABB()
   setNull();
 }
 
-AABB::AABB(const Vector3& center, br_real_t radius)
+AABB::AABB(const glm::vec3& center, float radius)
 {
   setNull();
   extend(center, radius);
 }
 
-AABB::AABB(const Vector3& p1, const Vector3& p2)
+AABB::AABB(const glm::vec3& p1, const glm::vec3& p2)
 {
   setNull();
   extend(p1);
@@ -32,16 +32,16 @@ AABB::~AABB()
 {
 }
 
-void AABB::extend(br_real_t val)
+void AABB::extend(float val)
 {
   if (!isNull())
   {
-    mMin -= Vector3(val);
-    mMax += Vector3(val);
+    mMin -= glm::vec3(val);
+    mMax += glm::vec3(val);
   }
 }
 
-void AABB::extend(const Vector3& p)
+void AABB::extend(const glm::vec3& p)
 {
   if (!isNull())
   {
@@ -55,9 +55,9 @@ void AABB::extend(const Vector3& p)
   }
 }
 
-void AABB::extend(const Vector3& p, br_real_t radius)
+void AABB::extend(const glm::vec3& p, float radius)
 {
-  Vector3 r(radius);
+  glm::vec3 r(radius);
   if (!isNull())
   {
     mMin = glm::min(p - r, mMin);
@@ -79,49 +79,49 @@ void AABB::extend(const AABB& aabb)
   }
 }
 
-void AABB::extendDisk(const Vector3& c, const Vector3& n, br_real_t r)
+void AABB::extendDisk(const glm::vec3& c, const glm::vec3& n, float r)
 {
   if (glm::length(n) < 1.e-12) { extend(c); return; }
-  Vector3 norm = glm::normalize(n);
-  br_real_t x = sqrt(1 - norm.x) * r;
-  br_real_t y = sqrt(1 - norm.y) * r;
-  br_real_t z = sqrt(1 - norm.z) * r;
-  extend(c + Vector3(x,y,z));
-  extend(c - Vector3(x,y,z));
+  glm::vec3 norm = glm::normalize(n);
+  float x = sqrt(1 - norm.x) * r;
+  float y = sqrt(1 - norm.y) * r;
+  float z = sqrt(1 - norm.z) * r;
+  extend(c + glm::vec3(x,y,z));
+  extend(c - glm::vec3(x,y,z));
 }
 
-Vector3 AABB::getDiagonal() const
+glm::vec3 AABB::getDiagonal() const
 {
   if (!isNull())
     return mMax - mMin;
   else
-    return Vector3(0);
+    return glm::vec3(0);
 }
 
-br_real_t AABB::getLongestEdge() const
+float AABB::getLongestEdge() const
 {
   return glm::compMax(getDiagonal());
 }
 
-br_real_t AABB::getShortestEdge() const
+float AABB::getShortestEdge() const
 {
   return glm::compMin(getDiagonal());
 }
 
-Vector3 AABB::getCenter() const
+glm::vec3 AABB::getCenter() const
 {
   if (!isNull())
   {
-    Vector3 d = getDiagonal();
-    return mMin + (d * br_real_t(0.5));
+    glm::vec3 d = getDiagonal();
+    return mMin + (d * float(0.5));
   }
   else
   {
-    return Vector3(0.0);
+    return glm::vec3(0.0);
   }
 }
 
-void AABB::translate(const Vector3& v)
+void AABB::translate(const glm::vec3& v)
 {
   if (!isNull())
   {
@@ -130,7 +130,7 @@ void AABB::translate(const Vector3& v)
   }
 }
 
-void AABB::scale(const Vector3& s, const Vector3& o)
+void AABB::scale(const glm::vec3& s, const glm::vec3& o)
 {
   if (!isNull())
   {
@@ -183,18 +183,18 @@ AABB::INTERSECTION_TYPE AABB::intersect(const AABB& b) const
 }
 
 
-bool AABB::isSimilarTo(const AABB& b, br_real_t diff) const
+bool AABB::isSimilarTo(const AABB& b, float diff) const
 {
   if (isNull() || b.isNull()) return false;
 
-  Vector3 acceptable_diff=( (getDiagonal()+b.getDiagonal()) / br_real_t(2.0))*diff;
-  Vector3 min_diff(mMin-b.mMin);
-  min_diff = Vector3(fabs(min_diff.x),fabs(min_diff.y),fabs(min_diff.z));
+  glm::vec3 acceptable_diff=( (getDiagonal()+b.getDiagonal()) / float(2.0))*diff;
+  glm::vec3 min_diff(mMin-b.mMin);
+  min_diff = glm::vec3(fabs(min_diff.x),fabs(min_diff.y),fabs(min_diff.z));
   if (min_diff.x > acceptable_diff.x) return false;
   if (min_diff.y > acceptable_diff.y) return false;
   if (min_diff.z > acceptable_diff.z) return false;
-  Vector3 max_diff(mMax-b.mMax);
-  max_diff = Vector3(fabs(max_diff.x),fabs(max_diff.y),fabs(max_diff.z));
+  glm::vec3 max_diff(mMax-b.mMax);
+  max_diff = glm::vec3(fabs(max_diff.x),fabs(max_diff.y),fabs(max_diff.z));
   if (max_diff.x > acceptable_diff.x) return false;
   if (max_diff.y > acceptable_diff.y) return false;
   if (max_diff.z > acceptable_diff.z) return false;
