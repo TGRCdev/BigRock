@@ -16,7 +16,11 @@ env.Append(CPPPATH = env['glfw_includes'], LIBPATH = env['glfw_libs'], LIBS=['gl
 if sys.platform.startswith('win32'):
     env.Append(LIBS=['opengl32', 'Gdi32'])
     if env['CC'] == 'cl':
-        env.Append(LIBS=['shell32', 'user32'], CCFLAGS=['/MD'])
+        env.Append(LIBS=['shell32', 'user32'])
+        if env['target'] == 'debug':
+            env.Append(CCFLAGS=['/MDd'])
+        else:
+            env.Append(CCFLAGS=['/MD'], LINKFLAGS=['/NODEFAULTLIB:MSVCRTD'])
 elif sys.platform.startswith('linux') or sys.platform.startswith('freebsd'):
     env.Append(LIBS=['X11', 'dl'])
 elif sys.platform.startswith('darwin'):
@@ -26,6 +30,10 @@ elif sys.platform.startswith('darwin'):
 Export('env', 'sources')
 SConscript('unit_tests/SCSub')
 
+# Generate shader headers
+Export('env')
+shader_bld = SConscript('shaders/SCSub')
+
 # Build test program
 env.Append(CPPPATH = thrd_inc)
 
@@ -34,6 +42,6 @@ for path in thrd_src:
     sources += Glob(str(path) + "/*.c")
 sources += [File("test.cpp")]
 
-env.Program("bin/BigRock_Test", source=sources)
+Requires(env.Program("bin/BigRock_Test", source=sources), shader_bld)
 
 Help(opts.GenerateHelpText(env))

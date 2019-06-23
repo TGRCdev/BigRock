@@ -29,3 +29,4 @@ test/src/resources/images/*.cpp
 *.dat
 src/data/schemas/*.h
 *.bin
+test/shaders/gen
