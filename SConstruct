@@ -147,9 +147,22 @@ if env['target'] == 'debug':
 
 # Setup schemas
 schemas = Glob("src/data/schemas/*.fbs")
+
 sch = []
 for schema in schemas:
-    sch += env.Command(str(schema)[:-4] + '_generated.h', schema, '"' + env['flatc_path'] + '" -o src/data/schemas -I src/data/schemas --cpp $SOURCE')
+    this_sch = env.Command(str(schema)[:-4] + '_generated.h', schema, '"' + env['flatc_path'] + '" -o src/data/schemas -I src/data/schemas --cpp $SOURCE')
+    # get dependencies
+    contents = schema.get_text_contents()
+    next_include = contents.find('include "')
+    pos = next_include
+    while(next_include != -1):
+        pos = next_include + len('include "')
+        #print("{} has dependency {}".format(os.path.basename(schema.abspath), contents[pos:contents.find('"', pos)]))
+        env.Depends(this_sch, os.path.dirname(schema.abspath) + "/" + contents[pos:contents.find('"', pos)])
+        pos = contents.find('"', pos)
+        next_include = contents.find('include "', pos)
+    
+    sch += this_sch
 
 lib = None
 if env['build_type'] == 'static':
