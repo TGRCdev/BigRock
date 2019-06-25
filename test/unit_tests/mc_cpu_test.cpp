@@ -42,9 +42,9 @@ int main()
     cout << "Marching Cubes Test" << endl;
     Cell cell;
     cout << "Applying 2 Ellipsoid tools at max_depth 4...";
-    cell.apply(t, a, 4, false);
+    cell.apply(t, a, 4);
     t.transform.origin.x = 0.6f;
-    cell.apply(t, a, 4, false);
+    cell.apply(t, a, 4);
     cout << "Done." << endl;
     cout << "Outputting cell AABB as OBJ file...";
     fstream c_aabb_out("cell_aabb.obj", ios::out);

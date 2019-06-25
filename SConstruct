@@ -102,7 +102,7 @@ if env['target'] == 'release':
 
 if env['CC'] == 'cl':
     if env['target'] == 'debug':
-        env.Append(CCFLAGS = ['/EHsc', '/DEBUG:FULL'], LINKFLAGS = ['/DEBUG:FULL'])
+        env.Append(CCFLAGS = ['/EHsc', '/DEBUG:FULL', '/Z7'], LINKFLAGS = ['/DEBUG:FULL'])
     else:
         env.Append(CCFLAGS = ['/O2'])
 

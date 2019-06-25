@@ -21,7 +21,7 @@ int JobPool::get_number_of_cores()
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
     numCores = sysinfo.dwNumberOfProcessors;
-#elif defined(unix) || defined(__unix__) || defined(__unix) || defined( __APPLE__ ) || defined( __BSD__ ) // People are saying that some compilers don't define any of these, god I hope not.
+#elif defined(unix) || defined(__unix__) || defined(__unix) || defined( __APPLE__ ) || defined( __BSD__ )
     numCores = sysconf(_SC_NPROCESSORS_ONLN);
 #else
     #pragma message "Couldn't find the target operating system, number of cores will always be one."
@@ -141,9 +141,9 @@ int JobPool::worker_t::worker_thread(void *userdata)
 
     // Return self to idle state
     thread_atomic_int_store(&data->worker->working, 0);
+	thread_signal_raise(&data->pool->boss_signal);
     delete data;
-    thread_signal_raise(&data->pool->boss_signal);
-    return 0;
+	return 0;
 }
 
 JobPool::JobPool(const unsigned char thread_count) : worker_count(thread_count)
