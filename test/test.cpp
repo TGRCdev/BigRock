@@ -33,6 +33,10 @@ void show_message(const char *message, const char *title = NULL)
 #include <string>
 #include <sstream>
 
+#if !defined(_MSC_VER)
+#include <unistd.h>
+#endif
+
 #define STARTWIDTH 800
 #define STARTHEIGHT 600
 #define MINWIDTH 640
@@ -44,7 +48,12 @@ Transform camera;
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    projection = glm::perspective(70.0f, float(width) / height, 0.01f, 1000.0f);
 }
+
+#if defined(_WIN32)
+#define sleep(seconds) Sleep(seconds * 1000)
+#endif
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -73,36 +82,46 @@ struct RenderModel
     VAO vao;
     unsigned int indices_size;
     Program program;
+    Transform transform;
 };
 
-std::vector<RenderModel> models;
+std::vector<RenderModel*> models;
 
 #include "shaders/gen/basic.h"
 
 void render()
 {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glm::mat4 camera_trns(camera);
-    for(std::vector<RenderModel>::const_iterator it = models.begin(); it != models.end(); it++)
+    for(std::vector<RenderModel*>::const_iterator it = models.begin(); it != models.end(); it++)
     {
-        if(!it->vao || !it->program)
+        RenderModel *model = (*it);
+        if(!model || !model->vao || !model->program)
             continue;
+
+        glBindVertexArray(model->vao);
+        glUseProgram(model->program);
         
-        glBindVertexArray(it->vao);
-        glUseProgram(it->program);
+        GLint proj_loc = glGetUniformLocation(model->program, "projection");
+        if(proj_loc != -1)
+            glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(projection));
+        GLint cam_loc = glGetUniformLocation(model->program, "camera");
+        if(cam_loc != -1)
+            glUniformMatrix4fv(cam_loc, 1, GL_FALSE, glm::value_ptr(camera_trns));
+        GLint model_loc = glGetUniformLocation(model->program, "model");
+        if(model_loc != -1)
+        {
+            glm::mat4 model_trns = glm::inverse(glm::mat4(model->transform));
+            glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model_trns));
+        }
         
-        GLuint proj_loc = glGetUniformLocation(it->program, "projection");
-        if(proj_loc)
-            glUniformMatrix4fv(proj_loc, 1, false, glm::value_ptr(projection));
-        GLuint cam_loc = glGetUniformLocation(it->program, "camera");
-        if(cam_loc)
-            glUniformMatrix4fv(cam_loc, 1, false, glm::value_ptr(camera_trns));
-        
-        glDrawElements(GL_TRIANGLES, it->indices_size, GL_UNSIGNED_INT, (void*)0);
+        glDrawElements(GL_TRIANGLES, model->indices_size, GL_UNSIGNED_INT, (void*)0);
     }
 }
 
 int main(int argc, char** argv)
 {
+    cout << "BigRock Test Program" << endl;
     int ok = glfwInit();
     if(!ok)
     {
@@ -177,21 +196,44 @@ int main(int argc, char** argv)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     Program basic_prog = programs::basic::get_program();
-    square.program = basic_prog;
-    if(square.program == 0)
+    if(basic_prog == 0)
     {
         show_message((std::string("Shader program failed to link.\n\n") + std::string(programs::basic::get_error_message())).c_str());
         glfwTerminate();
         return 1;
     }
+    square.program = basic_prog;
 
-    models.push_back(square);
+    models.push_back(&square);
+
+    // Setup projection
+    projection = glm::perspective(70.0f, float(STARTWIDTH) / STARTHEIGHT, 0.01f, 1000.0f);
 
     cout << "Beginning main loop" << endl;
 
+    double totalTime = glfwGetTime();
+    double lastTime = totalTime;
+
+    glClearColor(0.1f, 0.3f, 0.4f, 1.0f);
+
+    #define FRAMELIMIT 60
+    const double frametime = double(1) / FRAMELIMIT;
+
     while(!glfwWindowShouldClose(window))
     {
+        // Time
+        double time = glfwGetTime();
+        double delta = time - lastTime;
+        totalTime += delta;
+        lastTime = time;
+
+        // Movement, input, etc.
+        square.transform.rotation = glm::rotate(square.transform.rotation, float(delta), glm::vec3(0.0f,0.0f,1.0f));
+
+        // Rendering
         render();
+
+        // Error handling
         GLenum err = glGetError();
         if(err != GL_NO_ERROR)
         {
@@ -209,6 +251,9 @@ int main(int argc, char** argv)
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        // Yield
+        sleep(frametime);
     }
 
     glfwTerminate();

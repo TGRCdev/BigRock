@@ -55,7 +55,7 @@ int main()
     cout << "Output String Size: " << buffer.length() << endl;
     cout << "Tool Size: " << sizeof(Ellipsoid) << endl;
     
-    file.write(&buffer[0], buffer.length());
+    file.write(buffer.c_str(), buffer.length());
     file.close();
     return 0;
 }

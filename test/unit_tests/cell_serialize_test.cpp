@@ -64,7 +64,11 @@ int main()
     clock_t start = clock();
     cell->apply(t, a, 5);
     clock_t end = clock();
-    cout << "Tool application took " << (end - start) << " clocks (about " << ((end - start) / (CLOCKS_PER_SEC/1000)) << " milliseconds)" << endl;
+    cout << "Tool application took " << (end - start) << " clocks (about " << (float(end - start) / (CLOCKS_PER_SEC)) << " seconds)" << endl;
+    start = clock();
+    cell->optimize();
+    end = clock();
+    cout << "Tool optimization took " << (end - start) << " clocks (about " << (float(end - start) / (CLOCKS_PER_SEC)) << " seconds)" << endl;
 
     cout << "Center sample: " << cell->sample(glm::vec3(0.5f,0.5f,0.5f)).isovalue << endl;
     cout << "Edge sample: " << cell->sample(glm::vec3(0.0f,0.5f,0.5f)).isovalue << endl;
