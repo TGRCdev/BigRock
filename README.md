@@ -1,6 +1,6 @@
 # BigRock [![Build Status](https://travis-ci.org/TGRCdev/BigRock.svg?branch=master)](https://travis-ci.org/TGRCdev/BigRock) [![Build status](https://ci.appveyor.com/api/projects/status/hf34kno5f57llcc6?svg=true)](https://ci.appveyor.com/project/TigerCaldwell/bigrock)
 
-A work-in-progress 3D terrain library.
+A 3D terrain library for C++, designed to be wrapped for any 3D game engine. This library is currently incomplete, but is being worked on.
 
 ## Current Dependencies
 
