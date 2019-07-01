@@ -45,6 +45,8 @@ void show_message(const char *message, const char *title = NULL)
 glm::mat4 projection;
 Transform camera;
 
+bool lock_cursor = false;
+
 void window_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -55,9 +57,65 @@ void window_size_callback(GLFWwindow *window, int width, int height)
 #define sleep(seconds) Sleep(seconds * 1000)
 #endif
 
+glm::vec3 movement;
+
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-    // Placeholder
+    if(action == GLFW_PRESS)
+    {
+        switch(key)
+        {
+            case GLFW_KEY_TAB:
+            lock_cursor = !lock_cursor;
+            glfwSetInputMode(window, GLFW_CURSOR, lock_cursor ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+            break;
+            case GLFW_KEY_W:
+            movement.z -= 1;
+            break;
+            case GLFW_KEY_S:
+            movement.z += 1;
+            break;
+            case GLFW_KEY_A:
+            movement.x -= 1;
+            break;
+            case GLFW_KEY_D:
+            movement.x += 1;
+            break;
+        }
+    }
+    else if(action == GLFW_REPEAT)
+    {
+        // Placeholder
+    }
+    else // GLFW_RELEASE
+    {
+        switch(key)
+        {
+            case GLFW_KEY_W:
+            movement.z += 1;
+            break;
+            case GLFW_KEY_S:
+            movement.z -= 1;
+            break;
+            case GLFW_KEY_A:
+            movement.x += 1;
+            break;
+            case GLFW_KEY_D:
+            movement.x -= 1;
+            break;
+        }
+    }
+}
+
+glm::vec<2, double> mouse_delta;
+glm::vec<2, double> mouse_last_pos;
+
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    mouse_delta.x = xpos - mouse_last_pos.x;
+    mouse_delta.y = ypos - mouse_last_pos.y;
+    mouse_last_pos.x = xpos;
+    mouse_last_pos.y = ypos;
 }
 
 static const char* glErrorString(GLenum err) {
@@ -92,7 +150,7 @@ std::vector<RenderModel*> models;
 void render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glm::mat4 camera_trns(camera);
+    glm::mat4 camera_trns = glm::inverse(glm::mat4(camera));
     for(std::vector<RenderModel*>::const_iterator it = models.begin(); it != models.end(); it++)
     {
         RenderModel *model = (*it);
@@ -118,6 +176,27 @@ void render()
         glDrawElements(GL_TRIANGLES, model->indices_size, GL_UNSIGNED_INT, (void*)0);
     }
 }
+
+int handle_errors()
+{
+    GLenum err = glGetError();
+    if(err != GL_NO_ERROR)
+    {
+        stringstream err_stream;
+        while(err != GL_NO_ERROR)
+        {
+            err_stream << glErrorString(err);
+            err = glGetError();
+            if(err != GL_NO_ERROR) err_stream << "\n";
+        }
+        show_message((std::string("An error occured while rendering the next frame.\n\n") + err_stream.str()).c_str());
+        glfwTerminate();
+        return 1;
+    }
+    return 0;
+}
+
+const float camera_speed = 2.0f;
 
 int main(int argc, char** argv)
 {
@@ -161,6 +240,8 @@ int main(int argc, char** argv)
     glfwSetFramebufferSizeCallback(window, window_size_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetWindowSizeLimits(window, MINWIDTH, MINHEIGHT, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwGetCursorPos(window, &mouse_last_pos.x, &mouse_last_pos.y);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
 
     // Test square
     RenderModel square;
@@ -228,26 +309,25 @@ int main(int argc, char** argv)
         lastTime = time;
 
         // Movement, input, etc.
+        cout << "Mouse rotation: (" << mouse_delta.x << ", " << mouse_delta.y << ")" << endl;
+        if(mouse_delta.x != 0.0 || mouse_delta.y != 0.0)
+        {
+            camera.rotation = glm::rotate(camera.rotation, float(mouse_delta.y), glm::vec3(0,1,0));
+            camera.rotation = glm::rotate(camera.rotation, float(mouse_delta.x), glm::vec3(0,0,1));
+        }
+        camera.origin += movement * float(delta) * camera_speed;
+        mouse_delta.x = 0.0;
+        mouse_delta.y = 0.0;
+
         square.transform.rotation = glm::rotate(square.transform.rotation, float(delta), glm::vec3(0.0f,0.0f,1.0f));
 
         // Rendering
         render();
 
         // Error handling
-        GLenum err = glGetError();
-        if(err != GL_NO_ERROR)
-        {
-            stringstream err_stream;
-            while(err != GL_NO_ERROR)
-            {
-                err_stream << glErrorString(err);
-                err = glGetError();
-                if(err != GL_NO_ERROR) err_stream << "\n";
-            }
-            show_message((std::string("An error occured while rendering the next frame.\n\n") + err_stream.str()).c_str());
-            glfwTerminate();
-            return 1;
-        }
+        int err = handle_errors();
+        if(err != 0)
+            return err;
 
         glfwSwapBuffers(window);
         glfwPollEvents();

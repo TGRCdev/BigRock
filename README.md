@@ -1,4 +1,4 @@
-# BigRock [![Build Status](https://travis-ci.org/TGRCdev/BigRock.svg?branch=master)](https://travis-ci.org/TGRCdev/BigRock) [![Build status](https://ci.appveyor.com/api/projects/status/hf34kno5f57llcc6?svg=true)](https://ci.appveyor.com/project/TigerCaldwell/bigrock)
+# BigRock [![Build Status](https://travis-ci.org/TGRCdev/BigRock.svg?branch=master)](https://travis-ci.org/TGRCdev/BigRock) [![Build status](https://ci.appveyor.com/api/projects/status/hf34kno5f57llcc6?svg=true)](https://ci.appveyor.com/project/TigerCaldwell/bigrock)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ec715b44f8c243d093c75cde4de2f098)](https://www.codacy.com/app/TGRCdev/BigRock?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TGRCdev/BigRock&amp;utm_campaign=Badge_Grade)
 
 A 3D terrain library for C++, designed to be wrapped for any 3D game engine. This library is currently incomplete, but is being worked on.
 

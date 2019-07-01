@@ -1,0 +1,33 @@
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - xorg-dev
+        - libglu1-mesa-dev
+    configure:
+      command:
+        - mkdir dependencies
+        - cd dependencies
+        - git clone https://github.com/g-truc/glm
+        - cd glm
+        - cmake -D GLM_TEST_ENABLE:BOOL=0 .
+        - sudo make all
+        - cd ..
+        - git clone https://github.com/google/flatbuffers
+        - cd flatbuffers
+        - cmake -D FLATBUFFERS_BUILD_TESTS:BOOL=0 .
+        - sudo make all
+        - cd ..
+        - git clone https://github.com/glfw/glfw
+        - cd glfw
+        - cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 .
+        - sudo make all
+        - cd ..
+        - cd ..
+    before_index:
+      - export GLM_INC=dependencies/glm
+      - export GLFW_DIR=dependencies/glfw
+      - export FLTB_DIR=dependencies/flatbuffers
+    index:
+      build_command:
+        - scons build_type=static glm_includes=$GLM_INC glfw_dir=$GLFW_DIR flatbuffers_dir=$FLTB_DIR flatc_path=$FLTB_DIR/flatc
