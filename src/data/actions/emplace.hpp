@@ -10,7 +10,7 @@ namespace actions {
 
 struct Emplace : public Action
 {
-    Emplace(const unsigned char material = 0);
+    explicit Emplace(const unsigned char material = 0);
 
     ActionType get_action_type() const {return ACTION_TYPE_EMPLACE;}
     void update(const Tool &t, const glm::vec3 position, Point &v, ToolQueryResult *res) const;

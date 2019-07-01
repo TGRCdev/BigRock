@@ -5,12 +5,12 @@ A 3D terrain library for C++, designed to be wrapped for any 3D game engine. Thi
 ## Current Dependencies
 
 - OpenGL Mathematics
-    - https://glm.g-truc.net/
+    - <https://glm.g-truc.net/>
 - FlatBuffers
-    - https://google.github.io/flatbuffers/
+    - <https://google.github.io/flatbuffers/>
 
 ## Additional Test Dependencies
 - GLFW
-    - https://www.glfw.org/
+    - <https://www.glfw.org/>
 
 ![Prototype Image](https://user-images.githubusercontent.com/4079184/57591767-de752f80-74e7-11e9-854d-72f5aeb6f3b6.jpg)

@@ -38,7 +38,6 @@ int main()
     }
     tool.reset(new Ellipsoid());
     srand(time(NULL));
-    rand();
     tool->transform.origin = glm::vec3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));
     //tool.transform.origin = glm::vec3(28.7011f);
     tool->transform.scale = glm::vec3(rand_range(-50, 50), rand_range(-50, 50), rand_range(-50, 50));

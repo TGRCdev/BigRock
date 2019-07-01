@@ -13,7 +13,7 @@ namespace data {
 struct Point
 {
     Point();
-    Point(const schemas::Point &point);
+    explicit Point(const schemas::Point &point);
 
     isovalue_t isovalue; // TODO: See if half float can be used here
     unsigned char material;

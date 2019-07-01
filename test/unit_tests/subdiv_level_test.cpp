@@ -26,7 +26,7 @@ int main()
     cout << "Tool Application Timing Test" << endl;
     cout << "Number of cores: " << JobPool::get_number_of_cores() << endl;
     Ellipsoid whole; // A tool taking up space in the entire cell
-    whole.transform = glm::vec3(0.5f);
+    whole.transform.origin = glm::vec3(0.5f);
     Ellipsoid corner; // A tool only taking up the corner of the cell
     Ellipsoid small; // A tool only taking up a very small section of the corner of the cell
     small.transform.scale = glm::vec3(0.01f);

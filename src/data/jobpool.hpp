@@ -77,7 +77,7 @@ public:
 
     #if !BR_DISABLE_MULTITHREADING
 
-    JobPool(const unsigned char thread_count = get_number_of_cores());
+    explicit JobPool(const unsigned char thread_count = get_number_of_cores());
 
     // Waits for all current jobs to complete before destroying workers and boss.
     ~JobPool();

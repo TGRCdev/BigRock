@@ -39,7 +39,7 @@ class Cell
     void load(const schemas::Cell &cell, PointMap &points);
     Cell(const schemas::Cell &Cell, PointMap &points, unsigned int *cell_count, unsigned char subdiv_level, glm::vec3 position);
 
-    Cell(const schemas::Cell &cell);
+    explicit Cell(const schemas::Cell &cell);
 
     public:
     

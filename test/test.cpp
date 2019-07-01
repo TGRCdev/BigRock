@@ -151,7 +151,7 @@ void render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glm::mat4 camera_trns = glm::inverse(glm::mat4(camera));
-    for(std::vector<RenderModel*>::const_iterator it = models.begin(); it != models.end(); it++)
+    for(std::vector<RenderModel*>::const_iterator it = models.begin(); it != models.end(); ++it)
     {
         RenderModel *model = (*it);
         if(!model || !model->vao || !model->program)

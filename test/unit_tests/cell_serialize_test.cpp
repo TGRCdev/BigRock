@@ -30,7 +30,6 @@ void recursive_subdivide(Cell *cell, int max_depth)
 int main()
 {
     srand(time(0));
-    rand();
 
     cout << "Cell Serialize Test" << endl;
     std::string str = load_binary_file_as_string(FILENAME);

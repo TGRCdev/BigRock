@@ -16,7 +16,6 @@ int main()
     cout << "Ellipsoid Tool Value Test" << endl;
 
     srand(time(NULL));
-    rand();
     unsigned int vec_count = 3 + (rand() % 13);
 
     cout << "index|" << setw(33) << "Vector|" << setw(8) << "Length|" << setw(9) << "Value" << endl;

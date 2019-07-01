@@ -237,9 +237,9 @@ int JobPool::boss_thread(void *userdata)
         thread_signal_wait(&pool->boss_signal, THREAD_SIGNAL_WAIT_INFINITE); // Wait for wakeup signal
         // Check if there are jobs
         thread_mutex_lock(&pool->jobs_mutex);
-        bool idle_workers = true;
         if(!pool->jobs.empty())
         {
+            bool idle_workers = true;
             while(!pool->jobs.empty() && idle_workers)
             { // Jobs need workers, look for an open worker
                 worker_t *worker = NULL;

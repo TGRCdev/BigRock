@@ -14,12 +14,12 @@ namespace data {
     struct Transform
     {
         Transform();
-        Transform(glm::vec3 origin);
+        explicit Transform(glm::vec3 origin);
         Transform(glm::vec3 origin, glm::quat rotation);
         Transform(glm::vec3 origin, glm::quat rotation, glm::vec3 scale);
         Transform(const Transform &other);
 
-        Transform(const schemas::Transform *trns);
+        explicit Transform(const schemas::Transform *trns);
 
         glm::vec3 origin;
         glm::quat rotation;

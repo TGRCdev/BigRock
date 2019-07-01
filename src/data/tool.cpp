@@ -68,7 +68,7 @@ std::unique_ptr<Tool> Tool::deserialize(const void *buf, size_t length)
     if(!newtool)
         return nullptr;
     
-    newtool->transform = tool->transform();
+    newtool->transform = Transform(tool->transform());
     return std::unique_ptr<Tool>(newtool);
 }
 
