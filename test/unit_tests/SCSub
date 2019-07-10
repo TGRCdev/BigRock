@@ -5,9 +5,15 @@ def build_test_shell(target, source, env):
     path = target[0].abspath
     print(path)
     f = open(path, "w")
+    if platform.system() == 'Windows':
+        f.write("@echo off\n")
     for prog in source:
         f.write('"' + prog.abspath + '"')
         f.write("\n")
+        if platform.system() == 'Windows': # Batch
+            f.write("set /A last_err = %ERRORLEVEL%\nIF /I \"%last_err%\" NEQ \"0\" (\n\tECHO A unit test failed with error code %last_err%. Path: {}\n\tEXIT /B %last_err%\n)\n".format(prog.abspath))
+        else: # Shell
+            f.write("LAST_ERR=$?\nif [ \"$LAST_ERR\" -ne \"0\" ]\nthen\n\techo \"A unit test failed with error code $LAST_ERR. Path: {}\"\n\texit $LAST_ERR\nfi\n".format(prog.abspath))
     f.close()
     if(platform.system() != 'Windows'):
         os.chmod(target[0].abspath, stat.S_IREAD | stat.S_IWRITE | stat.S_IEXEC)
