@@ -146,8 +146,7 @@ void Cell::subdivide()
         glm::vec<3, int> cpos = GRID_VERTICES[i];
         
         #ifndef NDEBUG
-        bool badpos = glm::any(glm::greaterThanEqual(children[i].position, glm::vec3(1.0f)));// DEBUG
-        assert(badpos);
+        assert(!glm::any(glm::greaterThan(children[i].position, glm::vec3(1.0f))));
         #endif
 
         for(int j = 0; j < 8; j++)

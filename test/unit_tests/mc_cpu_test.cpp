@@ -43,7 +43,9 @@ int main()
     Cell cell;
     cout << "Applying 2 Ellipsoid tools at max_depth 4...";
     cell.apply(t, a, 4);
-    t.transform.origin.x = 0.6f;
+    t.transform.origin.x = 0.9f;
+    t.transform.origin.z = 0.6f;
+    t.transform.scale = glm::vec3(1.0f,0.7f,0.3f);
     cell.apply(t, a, 4);
     cout << "Done." << endl;
     cout << "Outputting cell AABB as OBJ file...";
