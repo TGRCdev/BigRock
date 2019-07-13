@@ -42,7 +42,7 @@ install:
       python -m pip install scons --user;
       sudo apt-get -y install xorg-dev libglu1-mesa-dev;
     fi
-  - git clone https://github.com/g-truc/glm || true
+  - git clone https://github.com/g-truc/glm --branch stable || true
   - cd glm
   - git pull
   - cd ..
@@ -50,7 +50,7 @@ install:
   - cd flatbuffers
   - git pull
   - cd ..
-  - git clone https://github.com/glfw/glfw || true
+  - git clone https://github.com/glfw/glfw --branch 3.3-stable || true
   - cd glfw
   - git pull
   - cd ..
