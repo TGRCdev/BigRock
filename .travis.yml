@@ -44,7 +44,7 @@ install:
     fi
   - git clone https://github.com/g-truc/glm --branch stable || true
   - cd glm
-  - git pull
+  - git pull origin stable
   - cd ..
   - git clone https://github.com/google/flatbuffers || true
   - cd flatbuffers
@@ -52,7 +52,7 @@ install:
   - cd ..
   - git clone https://github.com/glfw/glfw --branch 3.3-stable || true
   - cd glfw
-  - git pull
+  - git pull origin 3.3-stable
   - cd ..
   - mkdir CMake || true
   - cd CMake
