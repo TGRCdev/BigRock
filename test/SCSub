@@ -4,44 +4,8 @@ import platform, sys
 thrd_inc = [Dir('thirdparty/glad/include')]
 thrd_src = [Dir('thirdparty/glad/src')]
 
-if env['glfw_dir'] == '':
-    if platform.system() == 'Windows':
-        env['glfw_dir'] = Dir('C:/Program Files (x86)/GLFW')
-if env['glfw_includes'] == '' and env['glfw_dir'] != '':
-    env['glfw_includes'] = str(env['glfw_dir']) + '/include'
-if env['glfw_libs'] == '' and env['glfw_dir'] != '':
-    env['glfw_libs'] = str(env['glfw_dir']) + '/lib'
-
-env.Append(CPPPATH = env['glfw_includes'], LIBPATH = env['glfw_libs'], LIBS=['glfw3'])
-if sys.platform.startswith('win32'):
-    env.Append(LIBS=['opengl32', 'Gdi32'])
-    if env['CC'] == 'cl':
-        env.Append(LIBS=['shell32', 'user32'])
-        if env['target'] == 'debug':
-            env.Append(CCFLAGS=['/MDd'])
-        else:
-            env.Append(CCFLAGS=['/MD'], LINKFLAGS=['/NODEFAULTLIB:MSVCRTD'])
-elif sys.platform.startswith('linux') or sys.platform.startswith('freebsd'):
-    env.Append(LIBS=['X11', 'dl'])
-elif sys.platform.startswith('darwin'):
-    env.Append(FRAMEWORKS=['CoreVideo', 'Cocoa', 'OpenGL', 'IOKit', 'Carbon'])
-
 # Build unit tests
 Export('env', 'sources')
 SConscript('unit_tests/SCSub')
-
-# Generate shader headers
-Export('env')
-shader_bld = SConscript('shaders/SCSub')
-
-# Build test program
-env.Append(CPPPATH = thrd_inc)
-
-for path in thrd_src:
-    sources += Glob(str(path) + "/*.cpp")
-    sources += Glob(str(path) + "/*.c")
-sources += [File("test.cpp")]
-
-Requires(env.Program("bin/BigRock_Test", source=sources), shader_bld)
 
 Help(opts.GenerateHelpText(env))

@@ -32,7 +32,7 @@ opts.Add(PathVariable('glfw_libs', 'The path to a valid GLFW installation\'s bin
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
-    is_64bit = sys.maxsize > 2**32
+    is_64bit = platform.machine().endswith("64")
     if is_64bit:
         bits = '64'
     else:
@@ -43,7 +43,7 @@ target_arch = 'x86_64' if bits == '64' else 'x86'
 
 if ARGUMENTS.get('use_mingw', False) == 'yes':
     env = Environment(TARGET_ARCH = target_arch, tools = ['mingw'])
-    env['ENV']['PATH'] += ';C:\\Program Files\\mingw-w64\\x86_64-8.1.0-win32-seh-rt_v6-rev0\\mingw64\\bin'
+    env.PrependENVPath('PATH', 'C:\\Program Files\\mingw-w64\\x86_64-8.1.0-win32-seh-rt_v6-rev0\\mingw64\\bin');
 else:
     env = Environment(TARGET_ARCH = target_arch)
 
