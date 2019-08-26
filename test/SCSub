@@ -7,5 +7,3 @@ thrd_src = [Dir('thirdparty/glad/src')]
 # Build unit tests
 Export('env', 'sources')
 SConscript('unit_tests/SCSub')
-
-Help(opts.GenerateHelpText(env))

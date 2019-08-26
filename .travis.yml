@@ -10,7 +10,6 @@ cache:
     - $TRAVIS_BUILD_DIR/CMake
     - $TRAVIS_BUILD_DIR/glm
     - $TRAVIS_BUILD_DIR/flatbuffers
-    - $TRAVIS_BUILD_DIR/glfw
     - ~/.cache/pip
     - ~/Library/Caches/Homebrew
     - $TRAVIS_BUILD_DIR/.scons_cache
@@ -50,15 +49,10 @@ install:
   - cd flatbuffers
   - git pull
   - cd ..
-  - git clone https://github.com/glfw/glfw --branch 3.3-stable || true
-  - cd glfw
-  - git pull origin 3.3-stable
-  - cd ..
   - mkdir CMake || true
   - cd CMake
   - mkdir glm || true
   - mkdir flatbuffers || true
-  - mkdir glfw || true
   - cd glm
   - cmake -D GLM_TEST_ENABLE:BOOL=0 $TRAVIS_BUILD_DIR/glm
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
@@ -69,14 +63,6 @@ install:
   - cd ..
   - cd flatbuffers
   - cmake -D FLATBUFFERS_BUILD_TESTS:BOOL=0 $TRAVIS_BUILD_DIR/flatbuffers
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-      msbuild INSTALL.vcxproj;
-    else
-      sudo make install all;
-    fi
-  - cd ..
-  - cd glfw
-  - cmake -DGLFW_BUILD_DOCS:BOOL=0 -DGLFW_BUILD_TESTS:BOOL=0 -DGLFW_BUILD_EXAMPLES:BOOL=0 $TRAVIS_BUILD_DIR/glfw
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
       msbuild INSTALL.vcxproj;
     else
