@@ -1,58 +1,49 @@
 #include "point.hpp"
 
-#include <glm/common.hpp>
-
-#include "../math_funcs.hpp"
+#include "../mathfuncs.hpp"
 
 namespace bigrock {
-namespace data {
 
-Point::Point()
-{
-    this->isovalue = -1.0f;
-    this->material = 0;
-}
-
-Point::Point(const schemas::Point &point)
-{
-    this->isovalue = point.isovalue();
-    this->material = point.material();
-}
-
-Point Point::interpolate(const Point &other, const float &t) const
-{
-    if(t <= 0)
-        return *this;
-    else if(t >= 1)
-        return other;
-    else
+    Point Point::lerp(const Point other, float t) const
     {
-        Point ret;
-        ret.isovalue = glm::mix(this->isovalue, other.isovalue, t);
-        if(this->material == other.material)
-            ret.material = this->material;
+        if(t <= 0.0f)
+            return *this;
+        else if(t >= 1.0f)
+            return other;
         else
         {
-            float begin = glm::abs(this->isovalue);
-            float end = -glm::abs(other.isovalue);
-            float matval = glm::mix(begin, end, t);
-            if(matval <= 0)
-                ret.material = other.material;
-            else
-                ret.material = this->material;
+            if(this->material == other.material) // Same material, lerp density
+            {
+                return Point(this->material, bigrock::lerp<float>(this->density, other.density, t));
+            }
+            else if(sign_changes(this->density, other.density)) // Different material, one outside of isosurface
+            {
+                material_t mat = (this->density >= 0 ? this->material : other.material);
+                return Point(mat, bigrock::lerp<float>(this->density, other.density, t));
+            }
+            else // Different material, both in isosurface
+            {
+                // Interpolate material
+                isovalue_t mat_1 = abs(this->density);
+                isovalue_t mat_2 = -abs(other.density);
+                isovalue_t mat_true = bigrock::lerp(mat_1, mat_2, t);
+                if(mat_true >= 0)
+                    return Point(this->material, bigrock::lerp(this->density, other.density, t));
+                else
+                    return Point(other.material, bigrock::lerp(this->density, other.density, t));
+            }
         }
-        return ret;
+    }
+
+    bool Point::can_collapse(const Point other) const
+    {
+        if(sign_changes(this->density, other.density)) // Isosurface crossed between points
+            return false;
+        else if(this->material == other.material) // Same density sign, same material
+            return true;
+        else if(std::signbit(this->density)) // Same density sign, different material, points are outside isosurface
+            return true;
+        else // Same density sign, different material, points are inside isosurface
+            return false;
     }
 }
-
-bool Point::can_collapse(const Point &other) const
-{
-    if(sign_changes(this->isovalue, other.isovalue)) // Crosses isosurface
-        return false;
-    else if(this->isovalue >= 0 && this->material != other.material) // Filled with different materials
-        return false;
-    else // Either both empty, or filled with same material
-        return true;
-}
-
-}}

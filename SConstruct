@@ -1,6 +1,6 @@
 import platform, os, sys
 
-sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools"), Dir("src/data/actions")]
+sourcepaths = [Dir("src/"), Dir("src/data/"), Dir("src/mesh/"), Dir("src/data/tools"), Dir("src/data/actions"), Dir("src/stl")]
 licenses = {"glm":[File('thirdparty/glm/copying.txt')], "glm-aabb":[File('thirdparty/cpm-glm-aabb/LICENSE')], "flatbuffers":[File('thirdparty/flatbuffers/LICENSE.txt')], "bigrock":[File('LICENSE')]}
 
 def positive_validator(key, value, env):

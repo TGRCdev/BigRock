@@ -1,9 +1,9 @@
 Import('env', 'sources', 'opts')
-import platform, sys
+import os
 
-thrd_inc = [Dir('thirdparty/glad/include')]
-thrd_src = [Dir('thirdparty/glad/src')]
+test_env = env.Clone()
+test_env.Append(CPPPATH=[os.path.abspath("../src")])
 
 # Build unit tests
-Export('env', 'sources')
+Export('test_env', 'sources')
 SConscript('unit_tests/SCSub')
