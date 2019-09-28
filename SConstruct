@@ -11,21 +11,16 @@ def positive_validator(key, value, env):
 opts = Variables()
 opts.Add(EnumVariable('target', 'The build target', 'debug', ['release', 'debug'], ignorecase=2))
 opts.Add(EnumVariable('bits', 'The target bits', '', ['32', '64', '']))
-opts.Add(BoolVariable('use_mingw', 'Set to \'yes\' to use MinGW on Windows machines.', False))
 opts.Add(EnumVariable('build_type', 'The type of build to perform.', 'objects', ['objects', 'schemas', 'static', 'shared', 'dynamic', 'tests'], ignorecase=2))
 opts.Add(BoolVariable('make_dir', 'If \'yes\', constructs a library directory under \'lib/\' with the headers and the built library.', False))
-opts.Add(PathVariable('glm_dir', 'The location of the GLM library headers and binaries to link with.', '', PathVariable.PathAccept))
+opts.Add(PathVariable('glm_dir', 'The location of the GLM library headers and binaries to link with.', os.environ.get("GLM_DIR", ''), PathVariable.PathAccept))
 opts.Add(PathVariable('glm_includes', 'The location of the headers for GLM to use.', '', PathVariable.PathAccept))
-opts.Add(PathVariable('flatbuffers_dir', 'The location of the FlatBuffers binaries, headers and the flatc compiler.', '', PathVariable.PathAccept))
+opts.Add(PathVariable('flatbuffers_dir', 'The location of the FlatBuffers binaries, headers and the flatc compiler.', os.environ.get("FLATBUFFERS_DIR", ''), PathVariable.PathAccept))
 opts.Add(PathVariable('flatbuffers_includes', 'The location of the FlatBuffers headers directory.', '', PathVariable.PathAccept))
 opts.Add(PathVariable('flatbuffers_libs', 'The location of the FlatBuffers binaries directory.', '', PathVariable.PathAccept))
 opts.Add(PathVariable('flatc_path', 'The path to the FlatBuffers schema compiler.', '', PathVariable.PathAccept))
-opts.Add(BoolVariable('use_doubles', 'If \'yes\', uses double precision numbers for positions and isovalues.', False))
 opts.Add('max_cell_depth', 'The max depth that terrain cells are allowed to subdivide to.', 24, positive_validator)
-opts.Add(BoolVariable('fast_maths', 'Whether or not to use spooky floating point optimizations.', False))
 opts.Add(PathVariable('cache', 'If defined, caches build files here. Mostly for Travis CI and AppVeyor.', '', PathVariable.PathAccept))
-opts.Add(BoolVariable('multithreading', 'Whether or not to enable multithreading in certain areas of code.', True))
-opts.Add(BoolVariable('static_link_deps', 'When true, statically links all dependent libraries. Only for GCC/MinGW.', False))
 
 bits = ARGUMENTS.get('bits', '')
 if not bits: # Use host bits as default bits
@@ -38,35 +33,32 @@ if not bits: # Use host bits as default bits
 
 target_arch = 'x86_64' if bits == '64' else 'x86'
 
-if ARGUMENTS.get('use_mingw', False) == 'yes':
-    env = Environment(TARGET_ARCH = target_arch, tools = ['mingw'])
-    env.PrependENVPath('PATH', 'C:\\Program Files\\mingw-w64\\x86_64-8.1.0-win32-seh-rt_v6-rev0\\mingw64\\bin');
-else:
-    env = Environment(TARGET_ARCH = target_arch)
+env = Environment(TARGET_ARCH = target_arch)
 
 opts.Update(env)
 unknown = opts.UnknownVariables()
 if unknown:
-    print("WARNING: Unknown variables - ", unknown.keys())
+    print("WARNING: Unknown variables - " + str(unknown.keys()))
     Exit(1)
 
-if(env['fast_maths']):
-    print("\nWARNING: You have enabled fast maths.\nThis option can provide insane speed boosts, but it also breaks IEEE compliance and ignores values like NaN and Inf.\nOnly use this if you are extremely careful with what values you pass to BigRock.\nThis can ruin your entire life.\n\nNo pressure, though. I'm sure you know what you're doing.\n")
+if platform.system() == "Windows" and env['glm_dir'] == '':
+    print("ERR: Could not find GLM directory. Please set 'glm_dir' in your scons call, or define GLM_DIR in your environment variables.")
+    Exit(1)
 
-if env['glm_dir'] == '':
-    if platform.system() == 'Windows':
-        env['glm_dir'] = 'C:\\Program Files (x86)\\glm'
 if env['glm_includes'] == '' and env['glm_dir'] != '':
     env['glm_includes'] = Dir(env['glm_dir'] + '/include')
 env.Append(CPPPATH = [env['glm_includes']])
 
 if env['flatbuffers_dir'] == '':
     if platform.system() == 'Windows':
-        env['flatbuffers_dir'] = 'C:\\Program Files (x86)\\flatbuffers'
-        if env['flatbuffers_includes'] == '':
-            env['flatbuffers_includes'] = env['flatbuffers_dir'] + '/include'
-        if env['flatbuffers_libs'] == '':
-            env['flatbuffers_libs'] = env['flatbuffers_dir'] + '/lib'
+        print("ERR: Could not find FlatBuffers directory. Please set 'flatbuffers_dir' in your scons call, or define FLATBUFFERS_DIR in your environment variables.")
+        Exit(1)
+if env['flatbuffers_includes'] == '':
+    if platform.system() == "Windows":
+        env['flatbuffers_includes'] = env['flatbuffers_dir'] + '/include'
+if env['flatbuffers_libs'] == '':
+    if platform.system() == "Windows":
+        env['flatbuffers_libs'] = env['flatbuffers_dir'] + '/lib'
 
 if env['flatc_path'] == '':
     if platform.system() == 'Windows':
@@ -75,14 +67,10 @@ if env['flatc_path'] == '':
         env['flatc_path'] = 'flatc'
 env.Append(CPPPATH = [env['flatbuffers_includes']], LIBPATH = [env['flatbuffers_libs']], LIBS = 'flatbuffers')
 
-if env['cache'] != '':
+if env['cache']:
+    print("Caching enabled at directory \"" + env['cache'] + "\"")
     Mkdir(env['cache'])
     CacheDir(env['cache'])
-
-if env['use_doubles']:
-    env.Append(CPPDEFINES = 'BR_USE_DOUBLE_PRECISION')
-if not env['multithreading']:
-    env.Append(CPPDEFINES = 'BR_DISABLE_MULTITHREADING')
 
 ## This only works half of the time and it's really god damn annoying
 # conf = Configure(env)
@@ -107,8 +95,6 @@ if env['CC'] == 'cl':
     else:
         env.Append(LINKFLAGS = ['/MACHINE:X64'])
     
-    if env['fast_maths']:
-        env.Append(CCFLAGS = '/fp:fast')
 else:
     #env.Append(CCFLAGS = ['-ansi'])
     if env['target'] == 'debug':
@@ -120,13 +106,8 @@ else:
         env.Append(CCFLAGS = ['-m32'], LINKFLAGS = ['-m32'])
     else:
         env.Append(CCFLAGS = ['-m64'], LINKFLAGS = ['-m64'])
-
-    if env['fast_maths']:
-        env.Append(CCFLAGS = '-ffast-math')
     
     env.Append(CXXFLAGS = '-std=c++11', LIBS=['pthread'])
-    if env['CC'] == 'gcc' and env['static_link_deps']:
-        env.Append(CCFLAGS = ['-static-libgcc', '-static'], CXXFLAGS = ['-static-libstdc++'])
 
 if platform.system() == 'Windows':
     env.Append(LIBS=['winmm'])
@@ -180,6 +161,6 @@ if env['make_dir']:
             env.Install('lib/licenses/' + libname, licenses[libname])
         env.Install('lib/lib', lib)
     else:
-        print("WARN: make_dir only works when building a library")
+        print("WARN: make_dir only works when building a library. Scons will do nothing otherwise.")
 
 Help(opts.GenerateHelpText(env))
