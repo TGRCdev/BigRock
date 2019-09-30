@@ -6,7 +6,9 @@
 
 namespace bigrock {
 
-// Position of Point can be retrieved from the containing Cell
+/// A point within terrain.
+/// Does not contain a position to save space.
+/// Used for corners of Cells.
 struct Point
 {
     isovalue_t density;
@@ -38,6 +40,8 @@ struct Point
     /// with Point B, and B can collapse with Point C, then A can
     /// collapse with C.
     bool can_collapse(const Point other) const;
+
+    // TODO: Serialization, Deserialization
 };
 
 }

@@ -7,7 +7,7 @@ using namespace bigrock;
 
 int main()
 {
-    printf("Transform Test\n");
+    printf("\nTransform Test\n");
     printf("Creating Transform with rotation angles (0, 0, 90)\n");
     Transform t;
     t.rotation = glm::quat(glm::radians(glm::vec3(0, 0, 90)));

@@ -2,7 +2,6 @@
 #include <glm/gtx/component_wise.hpp>
 
 namespace bigrock {
-namespace data {
 
 AABB::AABB()
 {
@@ -201,4 +200,4 @@ bool AABB::isSimilarTo(const AABB& b, float diff) const
   return true;
 }
 
-}}
+}

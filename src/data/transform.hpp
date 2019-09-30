@@ -1,5 +1,6 @@
 #ifndef BIGROCK_TRANSFORM_H
 #define BIGROCK_TRANSFORM_H
+#pragma once
 
 #include <glm/vec3.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -43,6 +44,8 @@ namespace bigrock {
         /// Transforms the global coordinate point to local coordinates of the Transform
         /// Alias of xform_inv
         glm::vec3 to_local(glm::vec3 global) const {return xform_inv(global);}
+
+        // TODO: Serialization, Deserialization
     };
 
 }

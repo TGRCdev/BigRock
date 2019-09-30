@@ -1,5 +1,6 @@
 #ifndef IAUNS_GLM_AABB_HPP
 #define IAUNS_GLM_AABB_HPP
+#pragma once
 
 #include <glm/glm.hpp>
 
@@ -31,7 +32,6 @@
 // Modified for use in BigRock
 
 namespace bigrock {
-namespace data {
 
 /// Standalone axis aligned bounding box implemented built on top of GLM.
 class AABB
@@ -132,6 +132,6 @@ private:
   glm::vec3 mMax;   ///< Maximum point.
 };
 
-}}
+}
 
 #endif 
