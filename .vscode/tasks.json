@@ -18,20 +18,6 @@
       ]
     },
     {
-      "label": "Build Objects (MinGW)",
-      "type": "shell",
-      "command": "scons",
-      "group": "build",
-      "args": [
-        "use_mingw=yes",
-        "build_type=objects",
-        "-j4"
-      ],
-      "problemMatcher": [
-        "$gcc"
-      ]
-    },
-    {
       "label": "Compile Schemas",
       "type": "shell",
       "command": "scons",
@@ -56,21 +42,6 @@
       ]
     },
     {
-      "label": "Make Static Library (MinGW)",
-      "type": "shell",
-      "command": "scons",
-      "args": [
-        "build_type=static",
-        "make_dir=yes",
-        "use_mingw=yes",
-        "-j4"
-      ],
-      "group": "build",
-      "problemMatcher": [
-        "$gcc"
-      ]
-    },
-    {
       "label": "Build Test Program",
       "type": "shell",
       "command": "scons",
@@ -81,20 +52,6 @@
       "group": "build",
       "problemMatcher": [
         "$msCompile"
-      ]
-    },
-    {
-      "label": "Build Test Program (MinGW)",
-      "type": "shell",
-      "command": "scons",
-      "args": [
-        "build_type=tests",
-        "use_mingw=yes",
-        "-j4"
-      ],
-      "group": "build",
-      "problemMatcher": [
-        "$gcc"
       ]
     },
     {
@@ -110,39 +67,12 @@
       "problemMatcher": []
     },
     {
-      "label": "Clean Test Program (MinGW)",
-      "type": "shell",
-      "command": "scons",
-      "args": [
-        "build_type=tests",
-        "use_mingw=yes",
-        "-c",
-        "-j4"
-      ],
-      "group": "none",
-      "problemMatcher": []
-    },
-    {
       "label": "Clean Builds",
       "type": "shell",
       "command": "scons",
       "args": [
         "build_type=static",
         "make_dir=yes",
-        "-c",
-        "-j4"
-      ],
-      "group": "build",
-      "problemMatcher": []
-    },
-    {
-      "label": "Clean Builds (MinGW)",
-      "type": "shell",
-      "command": "scons",
-      "args": [
-        "build_type=static",
-        "make_dir=yes",
-        "use_mingw=yes",
         "-c",
         "-j4"
       ],

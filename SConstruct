@@ -8,9 +8,18 @@ def positive_validator(key, value, env):
         print("ERROR: " + key + " must be greater than 0. (value: " + str(value) + ")")
         Exit(1)
 
+is_64bit = platform.machine().endswith("64")
+if is_64bit:
+    host_bits = '64'
+else:
+    host_bits = '32'
+
+if not ARGUMENTS.get("bits", ''):
+    print('"bits" not set, assuming host bits: ' + host_bits)
+
 opts = Variables()
 opts.Add(EnumVariable('target', 'The build target', 'debug', ['release', 'debug'], ignorecase=2))
-opts.Add(EnumVariable('bits', 'The target bits', '', ['32', '64', '']))
+opts.Add(EnumVariable('bits', 'The target bits', host_bits, ['32', '64']))
 opts.Add(EnumVariable('build_type', 'The type of build to perform.', 'objects', ['objects', 'schemas', 'static', 'shared', 'dynamic', 'tests'], ignorecase=2))
 opts.Add(BoolVariable('make_dir', 'If \'yes\', constructs a library directory under \'lib/\' with the headers and the built library.', False))
 opts.Add(PathVariable('glm_dir', 'The location of the GLM library headers and binaries to link with.', os.environ.get("GLM_DIR", ''), PathVariable.PathAccept))
@@ -22,16 +31,7 @@ opts.Add(PathVariable('flatc_path', 'The path to the FlatBuffers schema compiler
 opts.Add('max_cell_depth', 'The max depth that terrain cells are allowed to subdivide to.', 24, positive_validator)
 opts.Add(PathVariable('cache', 'If defined, caches build files here. Mostly for Travis CI and AppVeyor.', '', PathVariable.PathAccept))
 
-bits = ARGUMENTS.get('bits', '')
-if not bits: # Use host bits as default bits
-    is_64bit = platform.machine().endswith("64")
-    if is_64bit:
-        bits = '64'
-    else:
-        bits = '32'
-    print("'bits' was not set, assuming host bits: " + bits)
-
-target_arch = 'x86_64' if bits == '64' else 'x86'
+target_arch = 'x86_64' if host_bits == '64' else 'x86'
 
 env = Environment(TARGET_ARCH = target_arch)
 
@@ -79,8 +79,6 @@ if env['cache']:
 # 	print("Please download and install GLM to build this library. ( https://glm.g-truc.net/ )")
 # 	Exit(1)
 
-env['bits'] = bits
-
 if env['target'] == 'release':
     env.Append(CPPDEFINES = "NDEBUG")
 
@@ -89,11 +87,6 @@ if env['CC'] == 'cl':
         env.Append(CCFLAGS = ['/EHsc', '/DEBUG:FULL', '/Z7'], LINKFLAGS = ['/DEBUG:FULL'])
     else:
         env.Append(CCFLAGS = ['/O2'])
-
-    if env['bits'] == '32':
-        env.Append(LINKFLAGS = ['/MACHINE:X86'])
-    else:
-        env.Append(LINKFLAGS = ['/MACHINE:X64'])
     
 else:
     #env.Append(CCFLAGS = ['-ansi'])

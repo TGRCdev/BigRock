@@ -4,6 +4,7 @@
 #include <cmath>
 #include <time.h>
 #include <assert.h>
+#include <stdio.h>
 
 using namespace bigrock;
 
