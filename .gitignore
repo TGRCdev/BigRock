@@ -17,16 +17,7 @@ config.log
 *.o
 *.os
 .DS_Store
-*.glsl.h
-*.jpg.h
-*.bmp.h
-*.jpeg.h
-*.png.h
-img_conv
-test/src/resources/images/*.h
-test/src/resources/images/*.cpp
 .vscode/ipch/
 *.dat
 src/data/schemas/*.h
 *.bin
-test/shaders/gen

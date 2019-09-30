@@ -25,6 +25,8 @@ namespace bigrock
         /// Returns the AABB containing the complete area of influence for the tool,
         /// including space outside of the shape's surface that has an isovalue > -1
         virtual AABB get_tool_aabb() const = 0;
+
+        // TODO: Serialization, Deserialization
     };
 }
 

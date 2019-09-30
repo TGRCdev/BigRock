@@ -16,6 +16,8 @@ namespace bigrock {
 
         AABB get_surface_aabb() const;
         AABB get_tool_aabb() const;
+
+        // TODO: Serialization, Deserialization
     };
 
 }
