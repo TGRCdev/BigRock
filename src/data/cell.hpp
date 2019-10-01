@@ -6,19 +6,55 @@
 #include "point.hpp"
 #include "shape.hpp"
 
+#include <memory>
+
 namespace bigrock {
 
-/// A chunk of terrain, represented in local coordinates between (0,0,0) and (1,1,1)
-/// Has pointers to 8 Points that represent the corners of the Cell.
-class Cell
-{
-    Point *corners[8];
-    bitflags8_t owned_corners;
-    Cell *children;
+    /// A chunk of terrain, represented in local coordinates between (0,0,0) and (1,1,1)
+    /// Has pointers to 8 Points that represent the corners of the Cell.
+    class Cell
+    {
+        std::shared_ptr<Point> corners[8];
+        /// corners used to have a owned_corners bitflag variable for defining
+        /// what corners could be deleted when this Cell was being collapsed.
+        /// This assumption was only valid when Point corners were shared among
+        /// child Cells, and not sibling cells.
+        Cell *children;
 
-public:
-    
-};
+        unsigned char depth;
+
+        // Creates an empty Cell without filling in corners or children
+        Cell(unsigned char depth) : depth(depth), children(nullptr) {}
+    public:
+        // Create a root Cell and its corners at depth 0
+        Cell();
+
+        // Returns the Point at corner index
+        Point &get_corner(unsigned char index);
+        // Returns the const Point at corner index
+        const Point &get_corner(unsigned char index) const;
+
+        // Returns the child at index, or nullptr if the Cell is a leaf
+        Cell *get_child(unsigned char index);
+        // Returns the child at index, or nullptr if the Cell is a leaf
+        const Cell *get_child(unsigned char index) const;
+
+        // Returns true if the Cell has no child Cells
+        bool is_leaf() const {return children == nullptr;}
+        // Returns true if the Cell has child Cells
+        bool has_children() const {return children != nullptr;}
+
+        /// Splits the Cell into 8 child Cells, interpolating the corners
+        /// of the children.
+        ///
+        /// If the Cell already has children, does nothing.
+        void subdivide();
+
+        /// Collapses the Cell's children and deletes their data.
+        ///
+        /// Does nothing if the Cell has no children.
+        void undivide();
+    };
 
 }
 
