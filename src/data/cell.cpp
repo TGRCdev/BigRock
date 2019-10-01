@@ -118,7 +118,7 @@ namespace bigrock {
 
         // Step 2: Assign points to children
 
-        children = (Cell)malloc(sizeof(Cell) * 8);
+        children = (Cell*)malloc(sizeof(Cell) * 8);
         for(int i = 0; i < 8; i++)
             new (children + i) (Cell) (depth + 1); // Placement new
         
@@ -127,5 +127,86 @@ namespace bigrock {
         children[0].corners[1] = new_points[0];
         children[0].corners[2] = new_points[1];
         children[0].corners[3] = new_points[2];
+        children[0].corners[4] = new_points[5];
+        children[0].corners[5] = new_points[6];
+        children[0].corners[6] = new_points[8];
+        children[0].corners[7] = new_points[9];
+
+        children[1].corners[0] = new_points[0];
+        children[1].corners[1] = corners[1];
+        children[1].corners[2] = new_points[2];
+        children[1].corners[3] = new_points[3];
+        children[1].corners[4] = new_points[6];
+        children[1].corners[5] = new_points[7];
+        children[1].corners[6] = new_points[9];
+        children[1].corners[7] = new_points[10];
+
+        children[2].corners[0] = new_points[1];
+        children[2].corners[1] = new_points[2];
+        children[2].corners[2] = corners[2];
+        children[2].corners[3] = new_points[4];
+        children[2].corners[4] = new_points[8];
+        children[2].corners[5] = new_points[9];
+        children[2].corners[6] = new_points[11];
+        children[2].corners[7] = new_points[12];
+
+        children[3].corners[0] = new_points[2];
+        children[3].corners[1] = new_points[3];
+        children[3].corners[2] = new_points[4];
+        children[3].corners[3] = corners[3];
+        children[3].corners[4] = new_points[9];
+        children[3].corners[5] = new_points[10];
+        children[3].corners[6] = new_points[12];
+        children[3].corners[7] = new_points[13];
+
+        children[4].corners[0] = new_points[5];
+        children[4].corners[1] = new_points[6];
+        children[4].corners[2] = new_points[8];
+        children[4].corners[3] = new_points[9];
+        children[4].corners[4] = corners[4];
+        children[4].corners[5] = new_points[14];
+        children[4].corners[6] = new_points[15];
+        children[4].corners[7] = new_points[16];
+
+        children[5].corners[0] = new_points[6];
+        children[5].corners[1] = new_points[7];
+        children[5].corners[2] = new_points[9];
+        children[5].corners[3] = new_points[10];
+        children[5].corners[4] = new_points[14];
+        children[5].corners[5] = corners[5];
+        children[5].corners[6] = new_points[16];
+        children[5].corners[7] = new_points[17];
+
+        children[6].corners[0] = new_points[8];
+        children[6].corners[1] = new_points[9];
+        children[6].corners[2] = new_points[11];
+        children[6].corners[3] = new_points[12];
+        children[6].corners[4] = new_points[15];
+        children[6].corners[5] = new_points[16];
+        children[6].corners[6] = corners[6];
+        children[6].corners[7] = new_points[18];
+
+        children[7].corners[0] = new_points[9];
+        children[7].corners[1] = new_points[10];
+        children[7].corners[2] = new_points[12];
+        children[7].corners[3] = new_points[13];
+        children[7].corners[4] = new_points[16];
+        children[7].corners[5] = new_points[17];
+        children[7].corners[6] = new_points[18];
+        children[7].corners[7] = corners[7];
+
+        // All done
+    }
+
+    void Cell::undivide()
+    {
+        if(is_leaf())
+            return;
+        
+        for(int i = 0; i < 8; i++)
+            children[i].~Cell();
+        
+        free(children);
+        children = nullptr;
     }
 }
