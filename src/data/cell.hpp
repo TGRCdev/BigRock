@@ -5,6 +5,7 @@
 
 #include "point.hpp"
 #include "shape.hpp"
+#include "point_query.hpp"
 
 #include <memory>
 
@@ -44,6 +45,10 @@ namespace bigrock {
         // Returns true if the Cell has child Cells
         bool has_children() const {return children != nullptr;}
 
+        /// Returns the index of the child containing the given point.
+        /// point is a vector between (0,0,0) and (1,1,1)
+        static unsigned char get_child_with_point(glm::vec3 point);
+
         /// Splits the Cell into 8 child Cells, interpolating the corners
         /// of the children.
         ///
@@ -54,6 +59,17 @@ namespace bigrock {
         ///
         /// Does nothing if the Cell has no children.
         void undivide();
+
+        // Query Functions
+
+        /// Traverse the Cell's children until a leaf is reached, then 
+        /// interpolates between the leaf's corners and returns the 
+        /// resulting data.
+        ///
+        /// When calling query_point on a Cell, point must have all
+        /// components between 0 and 1. Otherwise, returns default
+        /// data.
+        PointQuery query_point(glm::vec3 point) const;
     };
 
 }

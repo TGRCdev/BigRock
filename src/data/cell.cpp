@@ -209,4 +209,49 @@ namespace bigrock {
         free(children);
         children = nullptr;
     }
+
+    unsigned char Cell::get_child_with_point(glm::vec3 point)
+    {
+        unsigned char result = 0;
+        if(point.x > 0.5f)
+            result |= 1;
+        if(point.y > 0.5f)
+            result |= 2;
+        if(point.z > 0.5f)
+            result |=  4;
+        return result;
+    }
+
+    PointQuery Cell::query_point(glm::vec3 point) const
+    {
+        bool point_valid = glm::all(glm::greaterThanEqual(point, glm::vec3(0,0,0))) && glm::all(glm::lessThanEqual(point, glm::vec3(1,1,1))); // all components of point are >= 0 and <= 1
+        
+        assert(point_valid);
+        if(!point_valid)
+            return PointQuery();
+
+        if(has_children())
+        {
+            unsigned char next_index = get_child_with_point(point);
+            return get_child(next_index)->query_point(point);
+        }
+        else
+        {
+            // Interpolate
+            Point x_plane[4] = { // Squash the cube into a plane
+                corners[0]->lerp(*corners[1], point.x),
+                corners[2]->lerp(*corners[3], point.x),
+                corners[4]->lerp(*corners[5], point.x),
+                corners[6]->lerp(*corners[7], point.x)
+            };
+
+            Point y_line[2] = { // Squash the plane into a line
+                x_plane[0].lerp(x_plane[1], point.y),
+                x_plane[2].lerp(x_plane[3], point.y)
+            };
+
+            Point result = y_line[0].lerp(y_line[1], point.z); // Squash the line into a Point
+            return PointQuery(result.density, result.material, depth);
+        }
+    }
 }
