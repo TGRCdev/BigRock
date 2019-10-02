@@ -1,4 +1,4 @@
-#include <data/ellipsoid.hpp>
+#include <data/shapes/ellipsoid.hpp>
 
 #include "../shared.hpp"
 

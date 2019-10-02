@@ -2,7 +2,7 @@
 #define BIGROCK_ELLIPSOID_H
 #pragma once
 
-#include "shape.hpp"
+#include "../shape.hpp"
 
 namespace bigrock {
 
@@ -16,6 +16,8 @@ namespace bigrock {
 
         AABB get_surface_aabb() const;
         AABB get_tool_aabb() const;
+
+        std::unique_ptr<Shape> duplicate() const;
 
         // TODO: Serialization, Deserialization
     };

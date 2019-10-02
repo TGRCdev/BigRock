@@ -5,6 +5,7 @@
 
 #include "point.hpp"
 #include "shape.hpp"
+#include "action.hpp"
 #include "point_query.hpp"
 
 #include <memory>
@@ -26,6 +27,7 @@ namespace bigrock {
 
         // Creates an empty Cell without filling in corners or children
         Cell(unsigned char depth) : depth(depth), children(nullptr) {}
+
     public:
         // Create a root Cell and its corners at depth 0
         Cell();
@@ -60,7 +62,9 @@ namespace bigrock {
         /// Does nothing if the Cell has no children.
         void undivide();
 
-        // Query Functions
+        /// Recursively applies the given Action using Shape to all leaf Cells under this Cell.
+        /// shape's Transform should be set to fit the local Cell size of (0,0,0) to (1,1,1)
+        void apply(const Shape &shape, const Action &action, unsigned char max_depth);
 
         /// Traverse the Cell's children until a leaf is reached, then 
         /// interpolates between the leaf's corners and returns the 

@@ -5,6 +5,7 @@
 #include "transform.hpp"
 #include "../defines.hpp"
 #include "AABB.hpp"
+#include <memory>
 
 namespace bigrock
 {
@@ -25,6 +26,13 @@ namespace bigrock
         /// Returns the AABB containing the complete area of influence for the tool,
         /// including space outside of the shape's surface that has an isovalue > -1
         virtual AABB get_tool_aabb() const = 0;
+
+        /// Returns a deep copy of the Shape that can be modified without affecting the original.
+        /// Used for recursive shape action application
+        virtual std::unique_ptr<Shape> duplicate() const = 0;
+
+        // Returns true if the Shape is convex. Used for optimization.
+        virtual bool is_convex() const = 0;
 
         // TODO: Serialization, Deserialization
     };

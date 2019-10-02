@@ -1,5 +1,6 @@
 #include "cell.hpp"
 #include <assert.h>
+#include "../cube_vertices.hpp"
 
 namespace bigrock {
 
@@ -220,6 +221,46 @@ namespace bigrock {
         if(point.z > 0.5f)
             result |=  4;
         return result;
+    }
+
+    void Cell::apply(const Shape &s, const Action &a, unsigned char max_depth)
+    {
+        // Check depth and subdivide if needed
+        if(is_leaf() && depth < max_depth)
+        {
+            AABB aabb;
+            aabb.extend(glm::vec3(0,0,0));
+            aabb.extend(glm::vec3(1,1,1));
+            if(s.is_convex())
+            {
+                if(s.get_surface_aabb().intersect(aabb) == AABB::INTERSECT) // Crosses isosurface
+                    this->subdivide();
+            }
+            else
+            {
+                if(s.get_surface_aabb().intersect(aabb) != AABB::OUTSIDE)
+                    this->subdivide();
+            }
+        }
+
+        // To avoid double-applications, we only apply to Points on leaf cells
+        // Application ignores max_depth
+        if(has_children())
+        {
+            for(int i = 0; i < 8; i++)
+            {
+                std::unique_ptr<Shape> shape_copy = s.duplicate(); // TODO: Shape copy pooling?
+                shape_copy->transform.scale *= 2; // Child cells are half size, so shapes become twice as big relatively
+                shape_copy->transform.origin *= 2;
+                shape_copy->transform.origin -= CUBE_VERTICES[i] / float(unsigned long(1) << (depth + 1));
+                get_child(i)->apply(*shape_copy, a, max_depth);
+            }
+        }
+        else
+        {
+            for(int i = 0; i < 8; i++)
+                a.update(s, CUBE_VERTICES[i], *corners[i]);
+        }
     }
 
     PointQuery Cell::query_point(glm::vec3 point) const

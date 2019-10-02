@@ -29,4 +29,9 @@ namespace bigrock
             ret.extend(transform.to_global(points[i]));
         return ret;
     }
+
+    std::unique_ptr<Shape> Ellipsoid::duplicate() const
+    {
+        return std::unique_ptr<Shape>(new Ellipsoid(*this));
+    }
 }
