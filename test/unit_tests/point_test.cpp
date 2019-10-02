@@ -8,10 +8,6 @@
 
 using namespace bigrock;
 
-#define RAND_ISOVALUE() ((float(rand()) / RAND_MAX) * 2.0f) - 1.0f
-#define RAND_MATERIAL() material_t(rand())
-#define BOOL2STR(val) (val ? "true" : "false")
-
 #define TEST_RUNS 15
 
 bool collapse_transitive_test(unsigned short test_runs)
