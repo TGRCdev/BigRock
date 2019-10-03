@@ -19,6 +19,8 @@ namespace bigrock {
 
         std::unique_ptr<Shape> duplicate() const;
 
+        bool is_convex() const {return true;}
+
         // TODO: Serialization, Deserialization
     };
 
