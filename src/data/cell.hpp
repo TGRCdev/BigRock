@@ -42,6 +42,8 @@ namespace bigrock {
         // Returns the child at index, or nullptr if the Cell is a leaf
         const Cell *get_child(unsigned char index) const;
 
+        unsigned char get_depth() const {return depth;}
+
         // Returns true if the Cell has no child Cells
         bool is_leaf() const {return children == nullptr;}
         // Returns true if the Cell has child Cells

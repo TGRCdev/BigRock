@@ -4,7 +4,7 @@
 
 namespace bigrock {
 
-    Cell::Cell() : children(nullptr)
+    Cell::Cell() : children(nullptr), depth(0)
     {
         for(int i = 0; i < 8; i++)
             corners[i].reset(new Point());
